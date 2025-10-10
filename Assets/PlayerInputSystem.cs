@@ -105,7 +105,7 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
                     ""type"": ""Value"",
                     ""id"": ""492a4821-c5c6-4b45-b793-463a7e341f5c"",
                     ""expectedControlType"": ""Vector2"",
-                    ""processors"": ""ScaleVector2(x=2,y=2)"",
+                    ""processors"": ""ScaleVector2(x=20,y=20)"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 },

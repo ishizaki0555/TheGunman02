@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class Gun : MonoBehaviour
 {
     [SerializeField]
@@ -22,23 +23,27 @@ public class Gun : MonoBehaviour
     private LayerMask Mask;
     [SerializeField]
     private float BulletSpeed = 100;
+    [SerializeField]
+    private AudioClip shootSound;
 
     private Animator Animator;
+    private AudioSource audioSource;
     private float LastShootTime;
+    private bool isShooting = true;
 
     private void Awake()
     {
+        audioSource = GetComponent<AudioSource>();
         Animator = GetComponent<Animator>();
     }
 
     public void Shoot()
     {
-        if (LastShootTime + ShootDelay < Time.time)
+        if (LastShootTime + ShootDelay < Time.time && isShooting)
         {
-            // Use an object pool instead for these! To keep this tutorial focused, we'll skip implementing one.
-            // For more details you can see: https://youtu.be/fsDE_mO4RZM or if using Unity 2021+: https://youtu.be/zyzqA_CPz2E
-
-            //Animator.SetBool("IsShooting", true);
+            audioSource.PlayOneShot(shootSound);
+            isShooting = false;
+            Animator.SetBool("IsShooting", true);
             ShootingSystem.Play();
             Vector3 direction = GetDirection();
 
@@ -96,7 +101,8 @@ public class Gun : MonoBehaviour
 
             yield return null;
         }
-        //Animator.SetBool("IsShooting", false);
+        Animator.SetBool("IsShooting", false);
+        isShooting = true;
         Trail.transform.position = HitPoint;
         if (MadeImpact)
         {
