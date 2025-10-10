@@ -17,12 +17,12 @@ public class PlayerController : MonoBehaviour
     private float _turnVelocity;
     private bool _isGroundedPrev;
 
-    //[SerializeField] private Gun _gun;
+    [SerializeField] private Gun _gun;
 
-    //public void OnShoot()
-    //{
-    //    _gun.Shoot();
-    //}
+    public void OnShoot(InputAction.CallbackContext context)
+    {
+        if(context.performed) _gun.Shoot(); // ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½uŠÔ‚É”­Ë
+    }
     /// <summary>
     /// ˆÚ“®Action(PlayerInput‘¤‚©‚çŒÄ‚Î‚ê‚é)
     /// </summary>
