@@ -1,5 +1,9 @@
+// Gun.cs
+//
+// 銃を撃ちます
+//
+
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
@@ -31,14 +35,21 @@ public class Gun : MonoBehaviour
     private float LastShootTime;
     private bool isShooting = true;
 
+    [SerializeField] private HitManager _hitManager;
+
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         Animator = GetComponent<Animator>();
+        _hitManager = FindAnyObjectByType<HitManager>();
     }
 
+    /// <summary>
+    /// 銃の発射を行います
+    /// </summary>
     public void Shoot()
     {
+        // 連射防止
         if (LastShootTime + ShootDelay < Time.time && isShooting)
         {
             audioSource.PlayOneShot(shootSound);
@@ -47,15 +58,20 @@ public class Gun : MonoBehaviour
             ShootingSystem.Play();
             Vector3 direction = GetDirection();
 
+            // Rayを飛ばして当たったオブジェクトを調べる
             if (Physics.Raycast(BulletSpawnPoint.position, direction, out RaycastHit hit, float.MaxValue, Mask))
             {
+                string hitTag = hit.collider.tag;
+                _hitManager.TagCheck(hitTag, hit.collider.gameObject);
+
+
                 TrailRenderer trail = Instantiate(BulletTrail, BulletSpawnPoint.position, Quaternion.identity);
 
                 StartCoroutine(SpawnTrail(trail, hit.point, hit.normal, true));
 
                 LastShootTime = Time.time;
             }
-            // this has been updated to fix a commonly reported problem that you cannot fire if you would not hit anything
+            // 何も当たらなかった場合
             else
             {
                 TrailRenderer trail = Instantiate(BulletTrail, BulletSpawnPoint.position, Quaternion.identity);
@@ -67,6 +83,10 @@ public class Gun : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 銃弾の方向を取得します
+    /// </summary>
+    /// <returns>最終的な方向</returns>
     private Vector3 GetDirection()
     {
         Vector3 direction = transform.forward;
@@ -85,18 +105,23 @@ public class Gun : MonoBehaviour
         return direction;
     }
 
+    /// <summary>
+    /// 銃弾の軌跡を描画します
+    /// </summary>
     private IEnumerator SpawnTrail(TrailRenderer Trail, Vector3 HitPoint, Vector3 HitNormal, bool MadeImpact)
     {
-        // This has been updated from the video implementation to fix a commonly raised issue about the bullet trails
-        // moving slowly when hitting something close, and not
-        Vector3 startPosition = Trail.transform.position;
-        float distance = Vector3.Distance(Trail.transform.position, HitPoint);
-        float remainingDistance = distance;
 
+        Vector3 startPosition = Trail.transform.position; // 開始位置
+        float distance = Vector3.Distance(Trail.transform.position, HitPoint); // 開始位置と着弾点の距離
+        float remainingDistance = distance; // 残りの距離
+
+        // 移動
         while (remainingDistance > 0)
         {
+            // 開始位置から着弾点までの距離に応じて、銃弾の位置を線形補間で更新
             Trail.transform.position = Vector3.Lerp(startPosition, HitPoint, 1 - (remainingDistance / distance));
 
+            // 残りの距離を更新
             remainingDistance -= BulletSpeed * Time.deltaTime;
 
             yield return null;
@@ -104,6 +129,7 @@ public class Gun : MonoBehaviour
         Animator.SetBool("IsShooting", false);
         isShooting = true;
         Trail.transform.position = HitPoint;
+        // 着弾エフェクトの生成
         if (MadeImpact)
         {
             Instantiate(ImpactParticleSystem, HitPoint, Quaternion.LookRotation(HitNormal));
