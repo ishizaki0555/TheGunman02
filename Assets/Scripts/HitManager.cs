@@ -46,12 +46,14 @@ public class HitManager : MonoBehaviour
         }
         else if (TargetTag == princessTag)
         {
-            Debug.Log("プリンセスに命中");
-            Destroy(TargetObj); // 敵オブジェクトを破壊
+            TargetObj.GetComponent<Animator>().SetBool("isDead", true);
+            TargetObj.GetComponent<Collider>().enabled = false;
+            princessObj.Remove(TargetObj);
         }
-        else
+        else if(TargetTag == "PracticeTarget")
         {
-            Debug.Log("その他に命中");
+            TargetObj.GetComponent<Animator>().SetBool("isDead", true);
+            TargetObj.GetComponent<Collider>().enabled = false;
         }
     }
 }

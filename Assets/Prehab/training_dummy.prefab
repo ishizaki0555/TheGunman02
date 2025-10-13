@@ -108,7 +108,7 @@ GameObject:
   - component: {fileID: 569934417715200574}
   m_Layer: 0
   m_Name: training_dummy
-  m_TagString: Enemy
+  m_TagString: PracticeTarget
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - Queen
+  - PracticeTarget
   layers:
   - Default
   - TransparentFX
