@@ -1102,7 +1102,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyTag: Enemy
   princessTag: Queen
-  pairObj: []
+  enemyObj: []
+  princessObj: []
 --- !u!4 &791434204
 Transform:
   m_ObjectHideFlags: 0

@@ -19,14 +19,20 @@ public class HitManager : MonoBehaviour
     [SerializeField][Tag]
     private string princessTag; // ã~åÏëŒè€ÇÃÉ^ÉO
 
-    [SerializeField] private List<GameObject> pairObj = new List<GameObject>();
+    [SerializeField] private List<GameObject> enemyObj = new List<GameObject>();
+    [SerializeField] private List<GameObject> princessObj = new List<GameObject>();
 
     private void Awake()
     {
         GameObject[] targetObjects = GameObject.FindGameObjectsWithTag(enemyTag);
+        GameObject[] saveObjects = GameObject.FindGameObjectsWithTag(princessTag);
         foreach (GameObject obj in targetObjects)
         {
-            pairObj.Add(obj);
+            enemyObj.Add(obj);
+        }
+        foreach (GameObject obj in saveObjects)
+        {
+            princessObj.Add(obj);
         }
     }
 
@@ -36,7 +42,7 @@ public class HitManager : MonoBehaviour
         {
             TargetObj.GetComponent<Animator>().SetBool("isDead", true);
             TargetObj.GetComponent<Collider>().enabled = false;
-            pairObj.Remove(TargetObj);
+            enemyObj.Remove(TargetObj);
         }
         else if (TargetTag == princessTag)
         {
