@@ -19,13 +19,19 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Gun _gun;
 
+    /// <summary>
+    /// 射撃Action(PlayerInput側から呼ばれる)
+    /// </summary>
+    /// <param name="context">InputSystemからの入力値です</param>
     public void OnShoot(InputAction.CallbackContext context)
     {
         if(context.performed) _gun.Shoot(); // ボタンが押された瞬間に発射
     }
+
     /// <summary>
     /// 移動Action(PlayerInput側から呼ばれる)
     /// </summary>
+    /// <param name="context">InputSystemからの入力値です</param>
     public void OnMove(InputAction.CallbackContext context)
     {
         // 入力値を保持しておく
@@ -35,6 +41,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// ジャンプAction(PlayerInput側から呼ばれる)
     /// </summary>
+    /// <param name="context">InputSystemからの入力値です</param>
     public void OnJump(InputAction.CallbackContext context)
     {
         // ボタンが押された瞬間かつ着地している時だけ処理
@@ -55,6 +62,13 @@ public class PlayerController : MonoBehaviour
         PlayerMove(); // プレイヤーの移動
     }
 
+    /// <summary>
+    /// 以下のプレイヤーの移動処理を行います。
+    /// 前後左右の移動
+    /// ジャンプ
+    /// 落下処理
+    /// カメラの向きに合わせた移動
+    /// </summary>
     private void PlayerMove()
     {
         var isGrounded = _characterController.isGrounded;
