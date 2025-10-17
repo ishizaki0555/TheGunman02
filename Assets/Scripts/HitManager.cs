@@ -132,6 +132,11 @@ public class HitManager : MonoBehaviour
         {
             TargetObj.GetComponent<Animator>().SetTrigger("isDead");
         }
+        // ‚»‚êˆÈŠO
+        else
+        {
+            // ‰½‚à‚µ‚È‚¢
+        }
     }
 }
 
