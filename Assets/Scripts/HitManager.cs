@@ -6,8 +6,8 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using System.ComponentModel.Design;
+using TMPro;
+using Unity.Cinemachine;
 
 
 
@@ -25,22 +25,51 @@ public class HitManager : MonoBehaviour
     [SerializeField][Tag]
     private string parentTag; // 親のタグ
 
-    [SerializeField] private List<GameObject> enemyObj = new List<GameObject>();
-    [SerializeField] private List<GameObject> princessObj = new List<GameObject>();
-    [SerializeField] private List<GameObject> parentObj = new List<GameObject>();
+    // シネマシーンのカメラオブジェクト
+    [SerializeField] private CinemachineCamera ChineCameraOut;
+    [SerializeField] private CinemachineCamera ChineCameraIn;
+    [SerializeField] private GameObject gunObj; // ガンオブジェクト
+    [SerializeField] private GameObject GameCanvas; // ゲームキャンバスオブジェクト
+
+    [SerializeField] private List<GameObject> enemyObj = new List<GameObject>(); // 敵のオブジェクトリスト
+    [SerializeField] private List<GameObject> princessObj = new List<GameObject>(); // 救護対象のオブジェクトリスト
+    [SerializeField] private List<GameObject> parentObj = new List<GameObject>(); // 親のオブジェクトリスト
 
     [SerializeField] private int score; // スコア 
     [SerializeField] private int enemyCount; // 敵の数
 
+    [Range(0, 100)]
     [SerializeField] private float phaseTime = 30f; // フェーズの時間
     [SerializeField] private float breakTime = 2f; // 休憩時間
     [SerializeField] private float setUpTime = 6f; // フェーズ開始準備時間
+    [SerializeField] private float ScreenMoveTime = 3f; // 画面移動時間 
+
+    [SerializeField] private TextMeshProUGUI timeText; // タイム表示用UI
+    private bool isStart = false; // フェーズ開始フラグ
+
+    private AudioSource audio;
+    [SerializeField] private AudioClip phaseStartSE;
+    [SerializeField] private AudioClip gameEndSE;
+
+    public bool IsStart { get => isStart; private set => isStart = value; }
 
     private void Awake()
     {
+        audio = GetComponent<AudioSource>();
+        Invoke("StartSetUp", ScreenMoveTime);
+        gunObj.SetActive(false);
+    }
+
+
+    private void StartSetUp()
+    {
+        Debug.Log("フェーズ開始");
         score = 0;
 
-        // EnemyタグとPrincessタグのオブジェクトをリストに格納します
+        ChineCameraIn.Priority = 1;
+        ChineCameraOut.Priority = 0;
+
+        // EnemyタグとPrincessタグのオブジェクトと、その二つの親ををリストに格納します
         GameObject[] targetObjects = GameObject.FindGameObjectsWithTag(enemyTag);
         GameObject[] saveObjects = GameObject.FindGameObjectsWithTag(princessTag);
         GameObject[] parent = GameObject.FindGameObjectsWithTag(parentTag);
@@ -65,13 +94,34 @@ public class HitManager : MonoBehaviour
         Invoke("SetUp", setUpTime);
     }
 
+    private void Update()
+    {
+        // フェーズ時間のカウントダウン
+        // フェーズ時間が０になったら、isDown()を呼び出します
+        if (IsStart)
+        {
+            phaseTime -= Time.deltaTime;
+            timeText.text = phaseTime.ToString("00.0");
+            if(phaseTime <= 0)
+            {
+                IsStart = false;
+                isDown();
+                GameCanvas.GetComponent<Animator>().SetTrigger("GameEnd");
+            }
+        }
+    }
+
     /// <summary>
     /// フェーズ開始の準備をします
     /// １．エネミーと一般市民のオブジェクトをランダムに有効化します。
+    /// ２．エネミーの数をカウントします。
+    ///  3．エネミーの数が０だった場合、再度ランダムに有効化します。
     /// </summary>
     private void SetUp()
     {
         enemyCount = 0;
+        IsStart = true;
+        gunObj.SetActive(true);
         // enemyObjからランダムなオブジェクト有効化します。
         foreach (GameObject proj in parentObj)
         {
@@ -86,13 +136,16 @@ public class HitManager : MonoBehaviour
                 enemyCount++;
             }
         }
-        if (enemyCount == 0)
+        if (enemyCount == 0 && IsStart)
         {
             Invoke("isDown", breakTime);
             Invoke("SetUp", setUpTime);
         }
     }
 
+    /// <summary>
+    /// 各オブジェクトの降下アニメーションを再生します
+    /// </summary>
     private void isDown()
     {
         foreach (GameObject proj in parentObj)
@@ -115,7 +168,7 @@ public class HitManager : MonoBehaviour
             TargetObj.GetComponent<Animator>().SetTrigger("isDead");
             score++;
             enemyCount--;
-            if(enemyCount == 0)
+            if(enemyCount == 0 && IsStart)
             {
                 Invoke("isDown", breakTime);
                 Invoke("SetUp", setUpTime);

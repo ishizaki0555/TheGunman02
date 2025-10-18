@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     private bool _isGroundedPrev;
 
     [SerializeField] private Gun _gun;
+    [SerializeField] private HitManager _hitManager;
 
     /// <summary>
     /// 射撃Action(PlayerInput側から呼ばれる)
@@ -25,7 +26,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="context">InputSystemからの入力値です</param>
     public void OnShoot(InputAction.CallbackContext context)
     {
-        if(context.performed) _gun.Shoot(); // ボタンが押された瞬間に発射
+        if(context.performed && _hitManager.IsStart) _gun.Shoot(); // ボタンが押された瞬間に発射
     }
 
     /// <summary>
