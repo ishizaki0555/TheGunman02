@@ -53,6 +53,9 @@ public class HitManager : MonoBehaviour
 
     public bool IsStart { get => isStart; private set => isStart = value; }
 
+    /// <summary>
+    /// 初期化処理を行います。
+    /// </summary>
     private void Awake()
     {
         audio = GetComponent<AudioSource>();
@@ -60,7 +63,9 @@ public class HitManager : MonoBehaviour
         gunObj.SetActive(false);
     }
 
-
+    /// <summary>
+    /// 最初のフェーズの開始準備を行います
+    /// </summary>
     private void StartSetUp()
     {
         Debug.Log("フェーズ開始");
