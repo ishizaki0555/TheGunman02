@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 3781277414287830461}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -72.6269, y: -23.967886, z: -48.92631}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -50,6 +50,7 @@ MonoBehaviour:
   parentTag: Parent
   ChineCameraOut: {fileID: 0}
   ChineCameraIn: {fileID: 0}
+  _chineCameraInController: {fileID: 0}
   gunObj: {fileID: 4162735737228995293}
   GameCanvas: {fileID: 0}
   enemyObj: []
@@ -61,7 +62,12 @@ MonoBehaviour:
   breakTime: 2
   setUpTime: 6
   ScreenMoveTime: 3
+  countDownStartWaitTime: 3
   timeText: {fileID: 0}
+  countDownText: {fileID: 0}
+  countDownEndText: "\u30B9\u30BF\u30FC\u30C8\uFF01\uFF01\uFF01"
+  phaseStartSE: {fileID: 0}
+  gameEndSE: {fileID: 0}
 --- !u!82 &3744897926637911319
 AudioSource:
   m_ObjectHideFlags: 0
@@ -469,7 +475,7 @@ Transform:
   m_GameObject: {fileID: 8331129891165892170}
   serializedVersion: 2
   m_LocalRotation: {x: -0.17347084, y: 0.68913954, z: -0.17545941, w: -0.6813286}
-  m_LocalPosition: {x: 19.11929, y: 10.248476, z: -0.6189517}
+  m_LocalPosition: {x: 19.11929, y: 11.298476, z: -0.6189517}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

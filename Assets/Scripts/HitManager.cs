@@ -8,6 +8,10 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Cinemachine;
+using System.Collections;
+using UnityEngine.UI;
+
+
 
 
 
@@ -18,6 +22,7 @@ using UnityEditor;
 
 public class HitManager : MonoBehaviour
 {
+    [Header("タグ設定")]
     [SerializeField] [Tag]
     private string enemyTag; // 敵のタグ
     [SerializeField][Tag]
@@ -25,31 +30,41 @@ public class HitManager : MonoBehaviour
     [SerializeField][Tag]
     private string parentTag; // 親のタグ
 
+    [Header("カメラ関連")]
     // シネマシーンのカメラオブジェクト
-    [SerializeField] private CinemachineCamera ChineCameraOut;
-    [SerializeField] private CinemachineCamera ChineCameraIn;
+    [SerializeField] private CinemachineCamera ChineCameraOut; // 外視点のシネマシーン
+    [SerializeField] private CinemachineCamera ChineCameraIn; // 一人称のシネマシーン
+    [SerializeField] private CinemachineInputAxisController _chineCameraInController; // 一人称カメラの入力コントローラー
     [SerializeField] private GameObject gunObj; // ガンオブジェクト
     [SerializeField] private GameObject GameCanvas; // ゲームキャンバスオブジェクト
 
+    [Header("オブジェクトのリスト")]
     [SerializeField] private List<GameObject> enemyObj = new List<GameObject>(); // 敵のオブジェクトリスト
     [SerializeField] private List<GameObject> princessObj = new List<GameObject>(); // 救護対象のオブジェクトリスト
     [SerializeField] private List<GameObject> parentObj = new List<GameObject>(); // 親のオブジェクトリスト
 
+    [Header("各数値")]
     [SerializeField] private int score; // スコア 
     [SerializeField] private int enemyCount; // 敵の数
-
     [Range(0, 100)]
     [SerializeField] private float phaseTime = 30f; // フェーズの時間
     [SerializeField] private float breakTime = 2f; // 休憩時間
     [SerializeField] private float setUpTime = 6f; // フェーズ開始準備時間
     [SerializeField] private float ScreenMoveTime = 3f; // 画面移動時間 
 
+    [Header("UI関連")]
+    [SerializeField] private float countDownStartWaitTime = 3f; // カウントダウン開始までの待機時間
     [SerializeField] private TextMeshProUGUI timeText; // タイム表示用UI
+    [SerializeField] private TextMeshProUGUI countDownText; // カウントダウン表示用UI
+    [SerializeField] private TextMeshProUGUI enemyCountText; // 敵の数表示用UI
+    [SerializeField] private string countDownEndText;
     private bool isStart = false; // フェーズ開始フラグ
 
+    [Header("SE関連")]
     private AudioSource audio;
-    [SerializeField] private AudioClip phaseStartSE;
-    [SerializeField] private AudioClip gameEndSE;
+    [SerializeField] private AudioClip countDownSE; // カウントダウンSE
+    [SerializeField] private AudioClip phaseStartSE; // フェーズ開始SE
+    [SerializeField] private AudioClip gameEndSE; // ゲーム終了SE
 
     public bool IsStart { get => isStart; private set => isStart = value; }
 
@@ -59,6 +74,7 @@ public class HitManager : MonoBehaviour
     private void Awake()
     {
         audio = GetComponent<AudioSource>();
+        _chineCameraInController.enabled = false;
         Invoke("StartSetUp", ScreenMoveTime);
         gunObj.SetActive(false);
     }
@@ -68,7 +84,7 @@ public class HitManager : MonoBehaviour
     /// </summary>
     private void StartSetUp()
     {
-        Debug.Log("フェーズ開始");
+        _chineCameraInController.enabled = true;
         score = 0;
 
         ChineCameraIn.Priority = 1;
@@ -96,7 +112,30 @@ public class HitManager : MonoBehaviour
         }
 
         // フェーズ開始の準備をします
+        StartCoroutine(countDownAnim());
         Invoke("SetUp", setUpTime);
+    }
+
+    /// <summary>
+    /// カウントダウンアニメーションを再生します
+    /// </summary>
+    private IEnumerator countDownAnim()
+    {
+        // countDownStartWaitTime秒間待機した後、三秒間のカウントダウンを表示します
+        yield return new WaitForSeconds(countDownStartWaitTime);
+        int count = 3;
+        while(count > 0)
+        {
+            audio.PlayOneShot(countDownSE);
+            countDownText.text = count.ToString();
+            countDownText.gameObject.GetComponent<Animator>().SetTrigger("isCount");
+            count--;
+            yield return new WaitForSeconds(1f);
+        }
+        audio.PlayOneShot(phaseStartSE);
+        countDownText.text = countDownEndText;
+        countDownText.gameObject.GetComponent<Animator>().SetTrigger("isCount");
+        yield return new WaitForSeconds(1f);
     }
 
     private void Update()
@@ -109,7 +148,9 @@ public class HitManager : MonoBehaviour
             timeText.text = phaseTime.ToString("00.0");
             if(phaseTime <= 0)
             {
+                audio.PlayOneShot(gameEndSE);
                 IsStart = false;
+                _chineCameraInController.enabled = false;
                 isDown();
                 GameCanvas.GetComponent<Animator>().SetTrigger("GameEnd");
             }
@@ -139,6 +180,7 @@ public class HitManager : MonoBehaviour
             {
                 proj.transform.GetChild(1).GetComponent<Animator>().SetTrigger("isStart");
                 enemyCount++;
+                enemyCountText.text = enemyCount.ToString();
             }
         }
         if (enemyCount == 0 && IsStart)
@@ -173,7 +215,8 @@ public class HitManager : MonoBehaviour
             TargetObj.GetComponent<Animator>().SetTrigger("isDead");
             score++;
             enemyCount--;
-            if(enemyCount == 0 && IsStart)
+            enemyCountText.text = enemyCount.ToString();
+            if (enemyCount == 0 && IsStart)
             {
                 Invoke("isDown", breakTime);
                 Invoke("SetUp", setUpTime);

@@ -36,7 +36,8 @@ public class PlayerController : MonoBehaviour
     public void OnMove(InputAction.CallbackContext context)
     {
         // 入力値を保持しておく
-        _inputMove = context.ReadValue<Vector2>();
+        if(_hitManager.IsStart) _inputMove = context.ReadValue<Vector2>();
+        else _inputMove = Vector2.zero;
     }
 
     /// <summary>
@@ -46,7 +47,7 @@ public class PlayerController : MonoBehaviour
     public void OnJump(InputAction.CallbackContext context)
     {
         // ボタンが押された瞬間かつ着地している時だけ処理
-        if (!context.performed || !_characterController.isGrounded) return;
+        if ((!context.performed || !_characterController.isGrounded) || !_hitManager.IsStart) return;
 
         _verticalVelocity = _jumpSpeed;
     }
