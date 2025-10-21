@@ -59,6 +59,7 @@ public class Gun : MonoBehaviour
             Vector3 direction = GetDirection();
 
             // Rayを飛ばして当たったオブジェクトを調べる
+            // もし何かに当たった場合、そのタグをHitManagerのTagCheckに渡します。
             if (Physics.Raycast(BulletSpawnPoint.position, direction, out RaycastHit hit, float.MaxValue, Mask))
             {
                 string hitTag = hit.collider.tag;

@@ -3,11 +3,11 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float _speed = 3;
-    [SerializeField] private float _jumpSpeed = 7;
-    [SerializeField] private float _gravity = 15f;
-    [SerializeField] private float _fallSpeed = 10f;
-    [SerializeField] private float _initFallSpeed = 2f;
+    [SerializeField] private float _speed = 3;            // 移動速度
+    [SerializeField] private float _jumpSpeed = 7;      　// ジャンプ力
+    [SerializeField] private float _gravity = 15f;        // 落下速度
+    [SerializeField] private float _fallSpeed = 10f;      // 最大落下速度
+    [SerializeField] private float _initFallSpeed = 2f;   // 着地時の初期落下速度
 
     private Transform _transform;
     private CharacterController _characterController;
