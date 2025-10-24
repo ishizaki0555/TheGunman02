@@ -13,12 +13,15 @@ public class TitleCameraManager : MonoBehaviour
     [SerializeField] private string currentSceneName; // 現在選択されているシーン名
 
     private int currentCameraIndex = 0;
-    private bool isCameraSlected = false;
+    private bool canSlected = false;
+    private Animator _animator;
+
     [SerializeField] private bool isExperiment;
 
     private void Start()
     {
         titleCinameCamera.Priority.Value = 1;
+        _animator = GetComponent<Animator>();
     }
 
     /// <summary>
@@ -28,23 +31,24 @@ public class TitleCameraManager : MonoBehaviour
     public void OnSelect(InputAction.CallbackContext context)
     {
         // カメラが選択されていない状態で決定ボタンが押されたらカメラを選択状態にする
-        if (context.performed && !isCameraSlected)
+        if (context.performed && !canSlected)
         {
-            isCameraSlected = true;
+            canSlected = true;
+            _animator.SetTrigger("isStart");
             titleCinameCamera.Priority.Value = 0;
             cinemaCameras[currentCameraIndex].Priority.Value = 1;
             currentCamera = cinemaCameras[currentCameraIndex];
             currentSceneName = SceneNames[currentCameraIndex];
         }
         // 何もないシーンに移り、記録されているシーン名のシーンからオブジェクトを読み込む
-        else if (context.performed && isCameraSlected && !isExperiment)
+        else if (context.performed && canSlected && !isExperiment)
         {
             // カメラが選択された状態で決定ボタンが押されたら次のシーンへ
             PlayerPrefs.SetString("SelectedScene", currentSceneName);
             UnityEngine.SceneManagement.SceneManager.LoadScene("MainGame");
         }
         // 記録されているシーン名のシーンからオブジェクトを非同期で読み込む
-        else if (context.performed && isCameraSlected && isExperiment)
+        else if (context.performed && canSlected && isExperiment)
         {
             StartCoroutine(LoadYourAsyncScene());
         }
@@ -56,9 +60,10 @@ public class TitleCameraManager : MonoBehaviour
     /// <param name="context">InputSystemからの入力値です</param>
     public void OnNextCamera(InputAction.CallbackContext context)
     {
-        if(context.performed && isCameraSlected)
+        if(context.performed && canSlected)
         {
             currentCameraIndex++;
+            _animator.SetTrigger("isRight");
             currentCameraIndex = (int)Mathf.Repeat(currentCameraIndex, cinemaCameras.Count);
             SelectCamera();
         }
@@ -70,9 +75,10 @@ public class TitleCameraManager : MonoBehaviour
     /// <param name="context">InputSystemからの入力値です</param>
     public void OnPrevCamera(InputAction.CallbackContext context)
     {
-        if(context.performed && isCameraSlected)
+        if(context.performed && canSlected)
         {
             currentCameraIndex--;
+            _animator.SetTrigger("isLeft");
             currentCameraIndex = (int)Mathf.Repeat(currentCameraIndex, cinemaCameras.Count);
             SelectCamera();
         }
@@ -88,6 +94,14 @@ public class TitleCameraManager : MonoBehaviour
         currentCamera = cinemaCameras[currentCameraIndex];
         currentCamera.Priority.Value = 1;
         currentSceneName = SceneNames[currentCameraIndex];
+    }
+
+    /// <summary>
+    /// アニメーションから呼び出され、ステージ選択を可能にします。
+    /// </summary>
+    public void SetCanSelect()
+    {
+        canSlected = true;
     }
 
     /// <summary>
