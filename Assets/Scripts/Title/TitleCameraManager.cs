@@ -14,6 +14,7 @@ public class TitleCameraManager : MonoBehaviour
 
     private int currentCameraIndex = 0;
     private bool canSlected = false;
+    private bool isStarted = false;
     private Animator _animator;
 
     [SerializeField] private bool isExperiment;
@@ -22,6 +23,7 @@ public class TitleCameraManager : MonoBehaviour
     {
         titleCinameCamera.Priority.Value = 1;
         _animator = GetComponent<Animator>();
+        Cursor.lockState = CursorLockMode.Locked; // カーソルをロックする
     }
 
     /// <summary>
@@ -31,9 +33,8 @@ public class TitleCameraManager : MonoBehaviour
     public void OnSelect(InputAction.CallbackContext context)
     {
         // カメラが選択されていない状態で決定ボタンが押されたらカメラを選択状態にする
-        if (context.performed && !canSlected)
+        if (context.performed && !canSlected && isStarted)
         {
-            canSlected = true;
             _animator.SetTrigger("isStart");
             titleCinameCamera.Priority.Value = 0;
             cinemaCameras[currentCameraIndex].Priority.Value = 1;
@@ -102,6 +103,22 @@ public class TitleCameraManager : MonoBehaviour
     public void SetCanSelect()
     {
         canSlected = true;
+    }
+
+    /// <summary>
+    /// カメラ遷移中のステージ選択を不可能にします。
+    /// </summary>
+    public void DisableCanSelect()
+    {
+        canSlected = false;
+    }
+
+    /// <summary>
+    /// タイトル画面が開始されたことを設定します。
+    /// </summary>
+    public void SetIsStarted()
+    {
+        isStarted = true;
     }
 
     /// <summary>
