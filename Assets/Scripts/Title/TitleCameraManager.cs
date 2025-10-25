@@ -3,26 +3,31 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class TitleCameraManager : MonoBehaviour
 {
-    [SerializeField] private CinemachineCamera titleCinameCamera; // 一番最初に優先度を上げるシネマカメラ
-    [SerializeField] List<CinemachineCamera> cinemaCameras = new List<CinemachineCamera>(); // 選択画面で使うシネマカメラを管理するリスト
-    [SerializeField] List<string> SceneNames = new List<string>(); // 各カメラに対応するシーン名を管理するリスト
-    [SerializeField] CinemachineCamera currentCamera; // 現在選択されているカメラ
-    [SerializeField] private string currentSceneName; // 現在選択されているシーン名
+    [SerializeField] private Camera mainCamraa;                                                 // メインカメラ
+    [SerializeField] private float limitCameraMoveTime = 1.0f;                                  // カメラ移動制限時間
+    [SerializeField] List<string> SceneNames = new List<string>();                              // 各カメラに対応するシーン名を管理するリスト
+    [SerializeField] private string currentSceneName;                                           // 現在選択されているシーン名
+    [SerializeField] private Vector3 startCameraPosition;                                       // カメラの開始位置
+    [SerializeField] private Vector3 startCameraRotation;                                       // カメラの開始角度
+    [SerializeField] List<Vector3> CameraPosition = new List<Vector3>();                        // 各カメラの位置を管理するリスト
+    [SerializeField] List<Vector3> CameraRotation = new List<Vector3>();                        // 各カメラの角度を管理するリスト
 
-    private int currentCameraIndex = 0;
-    private bool canSlected = false;
-    private bool isStarted = false;
-    private Animator _animator;
+    private int currentCameraIndex = 0;             // 現在選択されているカメラのインデックス
+    private bool canSlected = false;                // カメラが選択されているかどうか
+    private bool isStarted = false;                 // タイトル画面が開始されたかどうか
+    private Animator _animator;         
 
     [SerializeField] private bool isExperiment;
 
     private void Start()
     {
-        titleCinameCamera.Priority.Value = 1;
         _animator = GetComponent<Animator>();
+        mainCamraa.gameObject.transform.position = startCameraPosition;
+        mainCamraa.gameObject.transform.eulerAngles = startCameraRotation;
         Cursor.lockState = CursorLockMode.Locked; // カーソルをロックする
     }
 
@@ -36,10 +41,9 @@ public class TitleCameraManager : MonoBehaviour
         if (context.performed && !canSlected && isStarted)
         {
             _animator.SetTrigger("isStart");
-            titleCinameCamera.Priority.Value = 0;
-            cinemaCameras[currentCameraIndex].Priority.Value = 1;
-            currentCamera = cinemaCameras[currentCameraIndex];
             currentSceneName = SceneNames[currentCameraIndex];
+            StartCoroutine(SetCameraPosition());
+            StartCoroutine(SetCameraRotation());
         }
         // 何もないシーンに移り、記録されているシーン名のシーンからオブジェクトを読み込む
         else if (context.performed && canSlected && !isExperiment)
@@ -64,8 +68,8 @@ public class TitleCameraManager : MonoBehaviour
         if(context.performed && canSlected)
         {
             currentCameraIndex++;
+            currentCameraIndex = (int)Mathf.Repeat(currentCameraIndex, SceneNames.Count);
             _animator.SetTrigger("isRight");
-            currentCameraIndex = (int)Mathf.Repeat(currentCameraIndex, cinemaCameras.Count);
             SelectCamera();
         }
     }
@@ -79,22 +83,74 @@ public class TitleCameraManager : MonoBehaviour
         if(context.performed && canSlected)
         {
             currentCameraIndex--;
+            currentCameraIndex = (int)Mathf.Repeat(currentCameraIndex, SceneNames.Count);
             _animator.SetTrigger("isLeft");
-            currentCameraIndex = (int)Mathf.Repeat(currentCameraIndex, cinemaCameras.Count);
             SelectCamera();
         }
     }
 
+    /// <summary>
+    /// カメラの位置を設定します
+    /// </summary>
+    private IEnumerator SetCameraPosition()
+    {
+        // 経過時間の初期化と開始地点の取得
+        float elapsedTime = 0.0f; // 経過時間
+        Vector3 startPosition = mainCamraa.transform.position;
+
+        // 制限時間まで毎フレーム補間を続ける
+        while (elapsedTime < limitCameraMoveTime)
+        {
+            mainCamraa.gameObject.transform.position = new Vector3(
+                Mathf.Lerp(startPosition.x, CameraPosition[currentCameraIndex].x, elapsedTime / limitCameraMoveTime),
+                Mathf.Lerp(startPosition.y, CameraPosition[currentCameraIndex].y, elapsedTime / limitCameraMoveTime),
+                Mathf.Lerp(startPosition.z, CameraPosition[currentCameraIndex].z, elapsedTime / limitCameraMoveTime)
+                );
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        // 補間が終わった後、目標の位置にぴったり合わせる
+        mainCamraa.gameObject.transform.position = CameraPosition[currentCameraIndex];
+        elapsedTime = 0.0f;
+    }
+
+    /// <summary>
+    /// カメラの角度を設定します。
+    /// 角度をスムーズに変化させるために、Quaternion.Slerpを使用しています。
+    /// </summary>
+    private IEnumerator SetCameraRotation()
+    {
+        float elapsedTime = 0.0f; // 経過時間
+
+        // 現在と次の角度を取得
+        Quaternion startRotation = mainCamraa.transform.rotation;
+        Quaternion targetRotation = Quaternion.Euler(CameraRotation[currentCameraIndex]);
+
+        // 制限時間まで補間を続ける
+        // 1. 経過時間を追跡するための変数を初期化
+        // 2. 経過時間が制限時間に達するまでループ
+        // 3. 補間率 t を計算: t は 0 から 1 に向かう
+        // 4. **Quaternion.Slerp（球面線形補間）**で回転をスムーズに補間
+        // 5. 経過時間を更新
+        while (elapsedTime < limitCameraMoveTime)
+        {
+            float t = elapsedTime / limitCameraMoveTime;
+            mainCamraa.gameObject.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, t);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        // 補間が終わった後、目標のクォータニオンにぴったり合わせる
+        mainCamraa.gameObject.transform.rotation = targetRotation;
+    }
     /// <summary>
     /// 現在のカメラから次のカメラ、または前のカメラに切り替えます。
     /// シーンの名前も対応して更新します。
     /// </summary>
     private void SelectCamera()
     {
-        currentCamera.Priority.Value = 0;
-        currentCamera = cinemaCameras[currentCameraIndex];
-        currentCamera.Priority.Value = 1;
         currentSceneName = SceneNames[currentCameraIndex];
+        StartCoroutine(SetCameraPosition());
+        StartCoroutine(SetCameraRotation());
     }
 
     /// <summary>
