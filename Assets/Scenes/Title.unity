@@ -34637,7 +34637,7 @@ MonoBehaviour:
   limitCameraMoveTime: 1
   SceneNames:
   - Stage01
-  - Stage01
+  - Stage02
   - Stage01
   currentSceneName: 
   startCameraPosition: {x: 78.86, y: 23, z: 37.55}

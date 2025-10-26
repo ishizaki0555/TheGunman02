@@ -1,0 +1,92 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public enum moveState
+{
+    Moving,     // 移動中
+    Waiting,    // 待機中
+    Dead        // 死亡
+}
+
+/// <summary>
+/// ユニットの移動設定データ
+/// </summary>
+[System.Serializable]
+public class UnitMoveSettings
+{
+    public GameObject unit;                                     // 移動するオブジェクト
+    public List<Transform> targetPos = new List<Transform>();   // 移動先リスト 
+    public float moveSpeed;                                     // 移動速度
+    public float standbyTime;                                   // 移動先での待機時間
+    public float rotatingSpeed;                                 // 回転速度
+    public moveState currentState;                              // 現在の移動状態
+}
+
+
+public class ObjectsMover : MonoBehaviour
+{
+    [SerializeField] private List<UnitMoveSettings> unitMoveSettings = new List<UnitMoveSettings>();    // 各ユニットの移動設定リスト
+
+    private void Start()
+    {
+        ObjectsMove();
+    }
+
+    /// <summary>
+    /// ユニットの移動を開始させます
+    /// </summary>
+    private void ObjectsMove()
+    {
+        // 各オブジェクトの移動を開始
+        foreach(var moveData in unitMoveSettings)
+        {
+            StartCoroutine(MoveObjectCoroutine(moveData));
+        }
+    }
+
+    IEnumerator MoveObjectCoroutine(UnitMoveSettings unitMoveSettings)
+    {
+        var unit = unitMoveSettings.unit;
+        unit.transform.position = unitMoveSettings.targetPos[0].position;
+        foreach(var nextPos in unitMoveSettings.targetPos)
+        {
+            Vector3 targetPosition = nextPos.position;
+            // unitの状態を移動中に変更し、targetPositionに到達するまで移動
+            // 移動し終わったら回転中に状態を変更し、次のtargetPositionまで回転
+            while (Vector3.Distance(unit.transform.position, targetPosition) > 0.1f)
+            {
+                // 状態を移動中に変更
+                unitMoveSettings.currentState = moveState.Moving;
+
+                // 次の目的地まで移動
+                unit.transform.position = Vector3.MoveTowards(
+                    unit.transform.position,
+                    targetPosition,
+                    unitMoveSettings.moveSpeed * Time.deltaTime
+                    );
+
+                // 目的地の方向を向くように回転
+                Vector3 direction = targetPosition - unit.transform.position;
+                if(direction != Vector3.zero)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(direction);
+                    unit.transform.rotation = Quaternion.Slerp(
+                        unit.transform.rotation,
+                        targetRotation,
+                        unitMoveSettings.rotatingSpeed * Time.deltaTime
+                        );
+                }
+                yield return null;
+            }
+
+            // 目的地に到着
+
+            // 状態を待機中に変更して待機
+            unitMoveSettings.currentState = moveState.Waiting;
+            yield return new WaitForSeconds(unitMoveSettings.standbyTime);
+
+        }
+        yield return null;
+    }
+}
