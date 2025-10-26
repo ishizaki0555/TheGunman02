@@ -111,8 +111,6 @@ public class PlayerControllerSolo : MonoBehaviour
 
             // Y²‰ñ“]Šp“x‚ğã‰º‚Ì§ŒÀ”ÍˆÍ“à‚Éû‚ß‚é
             _rotationY = Mathf.Clamp(_rotationY, _lookAngleMinY, _lookAngleMaxY);
-            // X²‰ñ“]Šp“x‚ğ¶‰E‚Ì§ŒÀ”ÍˆÍ“à‚Éû‚ß‚é
-            _rotationX = Mathf.Clamp(_rotationX, _lookAngleMinX, _lookAngleMaxX);
 
             // ƒJƒƒ‰‚ÌTransform‚É”½‰f
             _cameraTransform.localEulerAngles = new Vector3(_rotationY, _rotationX, 0);
