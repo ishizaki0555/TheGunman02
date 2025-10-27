@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("視点設定")]
     [SerializeField] private Camera _mainCamera;             // メインカメラ
-    [SerializeField] private float _lookSensitivity = 1.5f;  // 視点移動感度
+    [SerializeField] private float _lookSensitivity;        // 視点移動感度
     [SerializeField] private float _lookAngleMinY = -60f;    // 視点移動下限
     [SerializeField] private float _lookAngleMaxY = 60f;     // 視点移動上限
     [SerializeField] private float _rotationY = 0f;          // 現在の視点Y軸回転量
