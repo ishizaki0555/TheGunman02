@@ -8,19 +8,31 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("移動設定")]
     [SerializeField] private float _speed = 3;            // 移動速度
     [SerializeField] private float _jumpSpeed = 7;      　// ジャンプ力
     [SerializeField] private float _gravity = 15f;        // 落下速度
     [SerializeField] private float _fallSpeed = 10f;      // 最大落下速度
     [SerializeField] private float _initFallSpeed = 2f;   // 着地時の初期落下速度
 
+    [Header("視点設定")]
+    [SerializeField] private Camera _mainCamera;             // メインカメラ
+    [SerializeField] private float _lookSensitivity = 1.5f;  // 視点移動感度
+    [SerializeField] private float _lookAngleMinY = -60f;    // 視点移動下限
+    [SerializeField] private float _lookAngleMaxY = 60f;     // 視点移動上限
+    [SerializeField] private float _rotationY = 0f;          // 現在の視点Y軸回転量
+    [SerializeField] private float _rotationX = 0f;          // 現在の視点X軸回転量
+    [SerializeField] private Transform _cameraTransform;     // カメラのTransform
+    [SerializeField] private Transform Head;                 // 頭のTransform
+
     private Transform _transform;
     private CharacterController _characterController;
 
-    private Vector2 _inputMove;
-    private float _verticalVelocity;
-    private float _turnVelocity;
-    private bool _isGroundedPrev;
+    private Vector2 _inputMove;                 // 移動入力値
+    private Vector2 _inputLook;                 // 視点入力値
+    private float _verticalVelocity;            // 垂直方向の速度
+    private float _turnVelocity;                // 回転速度
+    private bool _isGroundedPrev;               // 前フレームの接地状態
 
     [SerializeField] private Gun _gun;
     [SerializeField] private HitManager _hitManager;
@@ -46,6 +58,25 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
+    /// 視点移動Action(PlayerInput側から呼ばれる)
+    /// </summary>
+    /// <param name="context">InputSystemからの入力値です</param>
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        if (_hitManager.IsStart) _inputLook = context.ReadValue<Vector2>();
+        else _inputLook = Vector2.zero;
+    }
+
+    /// <summary>
+    /// 決定Action(PlayerInput側から呼ばれる)
+    /// </summary>
+    /// <param name="context">InputSystemからの入力値です</param>
+    public void OnAcsept(InputAction.CallbackContext context)
+    {
+        if(_hitManager.EndGame) UnityEngine.SceneManagement.SceneManager.LoadScene("Title");
+    }
+
+    /// <summary>
     /// ジャンプAction(PlayerInput側から呼ばれる)
     /// </summary>
     /// <param name="context">InputSystemからの入力値です</param>
@@ -67,6 +98,34 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         PlayerMove(); // プレイヤーの移動
+    }
+
+    /// <summary>
+    /// カメラ操作は確実に行いたいのでLateUpdateで処理します
+    /// </summary>
+    private void LateUpdate()
+    {
+        if (_hitManager.IsStart)
+        {
+            // _inputLookの値を元に視点移動
+            float lookX = _inputLook.x * _lookSensitivity * Time.deltaTime;
+            float lookY = _inputLook.y * _lookSensitivity * Time.deltaTime;
+
+            // Y軸を中心に視点移動量を加算・減算
+            _mainCamera.transform.Rotate(Vector3.up * lookX);
+            _mainCamera.transform.Rotate(Vector3.right * -lookY);
+
+            // X軸を中心に視点移動量を加算・減算
+            _rotationY -= lookY;
+            _rotationX += lookX;
+
+            // Y軸回転角度を上下の制限範囲内に収める
+            _rotationY = Mathf.Clamp(_rotationY, _lookAngleMinY, _lookAngleMaxY);
+
+            // カメラのTransformに反映
+            _cameraTransform.localEulerAngles = new Vector3(_rotationY, _rotationX, 0);
+            _mainCamera.transform.position = Head.position;
+        }
     }
 
     /// <summary>

@@ -7,10 +7,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using TMPro;
-using Unity.Cinemachine;
 using System.Collections;
-using UnityEngine.UI;
-using JetBrains.Annotations;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -59,7 +56,7 @@ public class HitManagerSolo : MonoBehaviour
     private bool endGame = false;                                   // ゲーム終了フラグ 
     [SerializeField] private TextMeshProUGUI resultAttackPoint;     // 結果画面攻撃ポイント表示用UI
     [SerializeField] private TextMeshProUGUI resultOutPoint;        // 結果画面減点ポイント表示用UI
-    [SerializeField] private TextMeshProUGUI resultTortalPoint;     // 結果画面合計ポイント表示用UI
+    [SerializeField] private TextMeshProUGUI resultLimitTime;     // 結果画面合計ポイント表示用UI
 
     [Header("SE関連")]
     private AudioSource audio;
@@ -170,7 +167,7 @@ public class HitManagerSolo : MonoBehaviour
                 audio.PlayOneShot(gameEndSE);
                 IsStart = false;
                 EndGame = true;
-                resultTortalPoint.text = score.ToString();
+                resultLimitTime.text = phaseTime.ToString("00.0秒");
                 resultAttackPoint.text = attackPoint.ToString();
                 resultOutPoint.text = outPoint.ToString();
                 isDown();

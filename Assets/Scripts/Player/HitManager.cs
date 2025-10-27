@@ -7,10 +7,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using TMPro;
-using Unity.Cinemachine;
 using System.Collections;
-using UnityEngine.UI;
-using JetBrains.Annotations;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -29,47 +26,52 @@ public class HitManager : MonoBehaviour
 
     [Header("カメラ関連")]
     // シネマシーンのカメラオブジェクト
-    [SerializeField] private CinemachineCamera ChineCameraOut; // 外視点のシネマシーン
-    [SerializeField] private CinemachineCamera ChineCameraIn; // 一人称のシネマシーン
-    [SerializeField] private CinemachineInputAxisController _chineCameraInController; // 一人称カメラの入力コントローラー
-    [SerializeField] private GameObject gunObj; // ガンオブジェクト
-    [SerializeField] private GameObject GameCanvas; // ゲームキャンバスオブジェクト
+    [SerializeField] private Transform cameraPos;                // カメラポジションオブジェクト
+    [SerializeField] private Camera mainCamera;                  // メインカメラオブジェクト
+    [SerializeField] private GameObject gunObj;                  // ガンオブジェクト
+    [SerializeField] private GameObject GameCanvas;              // ゲームキャンバスオブジェクト
 
     [Header("オブジェクトのリスト")]
-    [SerializeField] private List<GameObject> enemyObj = new List<GameObject>(); // 敵のオブジェクトリスト
+    [SerializeField] private List<GameObject> enemyObj = new List<GameObject>();    // 敵のオブジェクトリスト
     [SerializeField] private List<GameObject> princessObj = new List<GameObject>(); // 救護対象のオブジェクトリスト
-    [SerializeField] private List<GameObject> parentObj = new List<GameObject>(); // 親のオブジェクトリスト
+    [SerializeField] private List<GameObject> parentObj = new List<GameObject>();   // 親のオブジェクトリスト
+
+    [Header("レイヤー設定")]
+    public string invisibleLayerName = "InvisibleToCamera";
+    [SerializeField] private GameObject playerObj;                  // プレイヤーオブジェクト
 
     [Header("各数値")]
-    [SerializeField] private int score; // スコア 
-    [SerializeField] private int outPoint; // 減点数
-    [SerializeField] private int enemyCount; // 敵の数
-    [SerializeField] private int attackPoint; // 攻撃ポイント
+    [SerializeField] private int score;                             // スコア 
+    [SerializeField] private int outPoint;                          // 減点数
+    [SerializeField] private int enemyCount;                        // 敵の数
+    [SerializeField] private int attackPoint;                       // 攻撃ポイント
     [Range(0, 100)]
-    [SerializeField] private float phaseTime = 30f; // フェーズの時間
-    [SerializeField] private float breakTime = 2f; // 休憩時間
-    [SerializeField] private float setUpTime = 6f; // フェーズ開始準備時間
-    [SerializeField] private float ScreenMoveTime = 3f; // 画面移動時間 
+    [SerializeField] private float phaseTime = 30f;                 // フェーズの時間
+    [SerializeField] private float breakTime = 2f;                  // 休憩時間
+    [SerializeField] private float setUpTime = 6f;                  // フェーズ開始準備時間
+    [SerializeField] private float ScreenMoveTime = 3f;             // 画面移動時間
+    [SerializeField] private float cameraMoveTime = 2f;             // カメラ移動時間
 
     [Header("UI関連")]
-    [SerializeField] private float countDownStartWaitTime = 3f; // カウントダウン開始までの待機時間
-    [SerializeField] private TextMeshProUGUI timeText; // タイム表示用UI
-    [SerializeField] private TextMeshProUGUI countDownText; // カウントダウン表示用UI
-    [SerializeField] private TextMeshProUGUI enemyCountText; // 敵の数表示用UI
+    [SerializeField] private float countDownStartWaitTime = 3f;     // カウントダウン開始までの待機時間
+    [SerializeField] private TextMeshProUGUI timeText;              // タイム表示用UI
+    [SerializeField] private TextMeshProUGUI countDownText;         // カウントダウン表示用UI
+    [SerializeField] private TextMeshProUGUI enemyCountText;        // 敵の数表示用UI
     [SerializeField] private string countDownEndText;
-    private bool isStart = false; // フェーズ開始フラグ
-    private bool endGame = false; // ゲーム終了フラグ 
+    private bool isStart = false;                                   // フェーズ開始フラグ
+    private bool endGame = false;                                   // ゲーム終了フラグ 
     [SerializeField] private TextMeshProUGUI resultAttackPoint;
     [SerializeField] private TextMeshProUGUI resultOutPoint;
     [SerializeField] private TextMeshProUGUI resultTortalPoint;
 
     [Header("SE関連")]
     private AudioSource audio;
-    [SerializeField] private AudioClip countDownSE; // カウントダウンSE
-    [SerializeField] private AudioClip phaseStartSE; // フェーズ開始SE
-    [SerializeField] private AudioClip gameEndSE; // ゲーム終了SE
+    [SerializeField] private AudioClip countDownSE;                 // カウントダウンSE
+    [SerializeField] private AudioClip phaseStartSE;                // フェーズ開始SE
+    [SerializeField] private AudioClip gameEndSE;                   // ゲーム終了SE
 
     public bool IsStart { get => isStart; private set => isStart = value; }
+    public bool EndGame { get => endGame; set => endGame = value; }
 
     /// <summary>
     /// 初期化処理を行います。
@@ -77,7 +79,6 @@ public class HitManager : MonoBehaviour
     private void Awake()
     {
         audio = GetComponent<AudioSource>();
-        _chineCameraInController.enabled = false;
         Invoke("StartSetUp", ScreenMoveTime);
         gunObj.SetActive(false);
     }
@@ -87,11 +88,12 @@ public class HitManager : MonoBehaviour
     /// </summary>
     private void StartSetUp()
     {
-        _chineCameraInController.enabled = true;
         score = 0;
 
-        ChineCameraIn.Priority = 1;
-        ChineCameraOut.Priority = 0;
+        InvisiblePlayerCamera();
+
+        // カメラの位置を移動させます
+        StartCoroutine(CameraSet());
 
         // EnemyタグとPrincessタグのオブジェクトと、その二つの親ををリストに格納します
         GameObject[] targetObjects = GameObject.FindGameObjectsWithTag(enemyTag);
@@ -141,6 +143,34 @@ public class HitManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
     }
 
+    /// <summary>
+    /// カメラをプレイヤー位置に移動させます
+    /// </summary>
+    private IEnumerator CameraSet()
+    {
+        float elapsedTime = 0.0f;         // 経過時間
+        Vector3 startingPos = mainCamera.transform.position; // カメラの開始位置
+        Quaternion startingRot = mainCamera.transform.rotation; // カメラの開始回転
+        Quaternion targetRotation = cameraPos.rotation; // カメラの目標回転
+
+        while (elapsedTime < cameraMoveTime)
+        {
+            mainCamera.gameObject.transform.position = new Vector3(
+                Mathf.Lerp(startingPos.x, cameraPos.position.x, elapsedTime / cameraMoveTime),
+                Mathf.Lerp(startingPos.y, cameraPos.position.y, elapsedTime / cameraMoveTime),
+                Mathf.Lerp(startingPos.z, cameraPos.position.z, elapsedTime / cameraMoveTime)
+                );
+            float t = elapsedTime / cameraMoveTime;
+            mainCamera.gameObject.transform.rotation = Quaternion.Slerp(startingRot, targetRotation, t);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        mainCamera.gameObject.transform.position = cameraPos.position;
+        mainCamera.gameObject.transform.rotation = targetRotation;
+        yield return null;
+    }
+
     private void Update()
     {
         // フェーズ時間のカウントダウン
@@ -153,8 +183,7 @@ public class HitManager : MonoBehaviour
             {
                 audio.PlayOneShot(gameEndSE);
                 IsStart = false;
-                endGame = true;
-                _chineCameraInController.enabled = false;
+                EndGame = true;
                 resultTortalPoint.text = score.ToString();
                 resultAttackPoint.text = attackPoint.ToString();
                 resultOutPoint.text = outPoint.ToString();
@@ -172,7 +201,7 @@ public class HitManager : MonoBehaviour
     /// </summary>
     private void SetUp()
     {
-        if(!endGame)
+        if(!EndGame)
         {
             enemyCount = 0;
             IsStart = true;
@@ -210,6 +239,15 @@ public class HitManager : MonoBehaviour
             proj.transform.GetChild(0).GetComponent<Animator>().SetTrigger("isDown");
             proj.transform.GetChild(1).GetComponent<Animator>().SetTrigger("isDown");
         }
+    }
+
+    /// <summary>
+    /// プレイヤーをカメラから見えなくします
+    /// </summary>
+    private void InvisiblePlayerCamera()
+    {
+        int invisibleLayer = LayerMask.NameToLayer(invisibleLayerName);
+        playerObj.layer = invisibleLayer;
     }
 
     /// <summary>

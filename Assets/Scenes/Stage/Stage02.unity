@@ -1493,7 +1493,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u7DCF\u30B9\u30B3\u30A2     \uFF1A"
+  m_text: "\u6B8B\u308A\u6642\u9593 \uFF1A"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a7c5c52f277c6354bb7dda45b0371c44, type: 2}
   m_sharedMaterial: {fileID: -9216812375240009295, guid: a7c5c52f277c6354bb7dda45b0371c44, type: 2}
@@ -4074,7 +4074,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 33.099995, y: 3.2000017}
+  m_AnchoredPosition: {x: 15.1, y: 3.2000017}
   m_SizeDelta: {x: 35.93124, y: 16.92785}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &502130630
@@ -16328,7 +16328,7 @@ MonoBehaviour:
   countDownEndText: "\u30B9\u30BF\u30FC\u30C8\uFF01\uFF01"
   resultAttackPoint: {fileID: 392342801}
   resultOutPoint: {fileID: 892214209}
-  resultTortalPoint: {fileID: 502130630}
+  resultLimitTime: {fileID: 502130630}
   countDownSE: {fileID: 8300000, guid: fcf1f43c83d0fde479f378cf9427bf84, type: 3}
   phaseStartSE: {fileID: 8300000, guid: 118391ae17dbb9f44a4d75b6731768b6, type: 3}
   gameEndSE: {fileID: 8300000, guid: e9fef8d484c293343ab5db249c780028, type: 3}
