@@ -1,3 +1,8 @@
+// LoadScene.cs
+//
+// シーン遷移をAdditiveモードで行う
+//
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

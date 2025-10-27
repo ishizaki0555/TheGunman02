@@ -1,3 +1,8 @@
+// PlayerControllerSolo.cs
+//
+// プレイヤーの操作を管理する
+//
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,8 +20,6 @@ public class PlayerControllerSolo : MonoBehaviour
     [SerializeField] private float _lookSensitivity = 1.5f;  // 視点移動感度
     [SerializeField] private float _lookAngleMinY = -60f;     // 視点移動下限
     [SerializeField] private float _lookAngleMaxY = 60f;      // 視点移動上限
-    [SerializeField] private float _lookAngleMinX = -90f;    // 視点移動左限
-    [SerializeField] private float _lookAngleMaxX = 90f;     // 視点移動右限
     [SerializeField] private float _rotationY = 0f;          // 現在の視点Y軸回転量
     [SerializeField] private float _rotationX = 0f;          // 現在の視点X軸回転量
     [SerializeField] private Transform _cameraTransform;     // カメラのTransform
@@ -41,11 +44,7 @@ public class PlayerControllerSolo : MonoBehaviour
     /// <param name="context">InputSystemからの入力値です</param>
     public void OnLook(InputAction.CallbackContext context)
     {
-        if (_hitManager.IsStart)
-        {
-            _inputLook = context.ReadValue<Vector2>();
-            Debug.Log(_inputLook);
-        }
+        if (_hitManager.IsStart) _inputLook = context.ReadValue<Vector2>();
         else _inputLook = Vector2.zero;
     }
 
@@ -67,6 +66,11 @@ public class PlayerControllerSolo : MonoBehaviour
         // 入力値を保持しておく
         if (_hitManager.IsStart) _inputMove = context.ReadValue<Vector2>();
         else _inputMove = Vector2.zero;
+    }
+
+    public void OnAcsept(InputAction.CallbackContext context)
+    {
+        if(_hitManager.EndGame) UnityEngine.SceneManagement.SceneManager.LoadScene("Title");
     }
 
     /// <summary>

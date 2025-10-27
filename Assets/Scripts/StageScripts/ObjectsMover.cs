@@ -1,3 +1,8 @@
+// ObjectsMover.cs
+//
+// ユニットを指定の位置まで移動させる
+//
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,15 +33,10 @@ public class ObjectsMover : MonoBehaviour
 {
     [SerializeField] private List<UnitMoveSettings> unitMoveSettings = new List<UnitMoveSettings>();    // 各ユニットの移動設定リスト
 
-    private void Start()
-    {
-        ObjectsMove();
-    }
-
     /// <summary>
     /// ユニットの移動を開始させます
     /// </summary>
-    private void ObjectsMove()
+    public void ObjectsMove()
     {
         // 各オブジェクトの移動を開始
         foreach(var moveData in unitMoveSettings)
@@ -45,16 +45,23 @@ public class ObjectsMover : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// ユニットを指定の位置まで移動させます
+    /// </summary>
+    /// <param name="unitMoveSettings">ユニットの移動設定リスト</param>
     IEnumerator MoveObjectCoroutine(UnitMoveSettings unitMoveSettings)
     {
         var unit = unitMoveSettings.unit;
         unit.transform.position = unitMoveSettings.targetPos[0].position;
-        foreach(var nextPos in unitMoveSettings.targetPos)
+        Collider enemyCollider = unit.transform.GetChild(0).GetComponent<Collider>();
+
+        // 次の目的地まで移動・待機を繰り返す
+        foreach (var nextPos in unitMoveSettings.targetPos)
         {
             Vector3 targetPosition = nextPos.position;
             // unitの状態を移動中に変更し、targetPositionに到達するまで移動
             // 移動し終わったら回転中に状態を変更し、次のtargetPositionまで回転
-            while (Vector3.Distance(unit.transform.position, targetPosition) > 0.1f)
+            while (Vector3.Distance(unit.transform.position, targetPosition) > 0.1f && enemyCollider.enabled != false)
             {
                 // 状態を移動中に変更
                 unitMoveSettings.currentState = moveState.Moving;
@@ -67,7 +74,7 @@ public class ObjectsMover : MonoBehaviour
                     );
 
                 // 目的地の方向を向くように回転
-                Vector3 direction = targetPosition - unit.transform.position;
+                Vector3 direction = unit.transform.position - targetPosition;
                 if(direction != Vector3.zero)
                 {
                     Quaternion targetRotation = Quaternion.LookRotation(direction);

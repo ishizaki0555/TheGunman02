@@ -1,3 +1,8 @@
+// HitManagerSolo.cs
+//
+// 個々のユニットのヒット管理を行う
+//
+
 using UnityEngine;
 using System;
 using System.Collections.Generic;
@@ -24,21 +29,25 @@ public class HitManagerSolo : MonoBehaviour
     [SerializeField] private Transform cameraPos;                           // カメラポジションオブジェクト
     [SerializeField] private Camera mainCamera;                             // メインカメラオブジェクト
 
+    [Header("レイヤー設定")]
+    public string invisibleLayerName = "InvisibleToCamera";
+    [SerializeField] private GameObject playerObj;                          // プレイヤーオブジェクト
+
     [Header("オブジェクトのリスト")]
     [SerializeField] private List<GameObject> enemyObjs = new List<GameObject>();    // 敵のオブジェクトリスト
     [SerializeField] private List<GameObject> princessObjs = new List<GameObject>(); // 救護対象のオブジェクトリスト
 
     [Header("各数値")]
-    [SerializeField] private int score;             // スコア 
-    [SerializeField] private int outPoint;          // 減点数
-    [SerializeField] private int enemyCount;        // 敵の数
-    [SerializeField] private int attackPoint;       // 攻撃ポイント
+    [SerializeField] private int score;                             // スコア 
+    [SerializeField] private int outPoint;                          // 減点数
+    [SerializeField] private int enemyCount;                        // 敵の数
+    [SerializeField] private int attackPoint;                       // 攻撃ポイント
     [Range(0, 100)]
-    [SerializeField] private float phaseTime = 30f; // フェーズの時間
-    [SerializeField] private float breakTime = 2f; // 休憩時間
-    [SerializeField] private float setUpTime = 6f; // フェーズ開始準備時間
-    [SerializeField] private float ScreenMoveTime = 3f; // 画面移動時間 
-    [SerializeField] private float cameraMoveTime = 2f; // カメラ移動時間
+    [SerializeField] private float phaseTime = 30f;                 // フェーズの時間
+    [SerializeField] private float breakTime = 2f;                  // 休憩時間
+    [SerializeField] private float setUpTime = 6f;                  // フェーズ開始準備時間
+    [SerializeField] private float ScreenMoveTime = 3f;             // 画面移動時間 
+    [SerializeField] private float cameraMoveTime = 2f;             // カメラ移動時間
 
     [Header("UI関連")]
     [SerializeField] private float countDownStartWaitTime = 3f;     // カウントダウン開始までの待機時間
@@ -48,9 +57,9 @@ public class HitManagerSolo : MonoBehaviour
     [SerializeField] private string countDownEndText;
     private bool isStart = false;                                   // フェーズ開始フラグ
     private bool endGame = false;                                   // ゲーム終了フラグ 
-    [SerializeField] private TextMeshProUGUI resultAttackPoint;
-    [SerializeField] private TextMeshProUGUI resultOutPoint;
-    [SerializeField] private TextMeshProUGUI resultTortalPoint;
+    [SerializeField] private TextMeshProUGUI resultAttackPoint;     // 結果画面攻撃ポイント表示用UI
+    [SerializeField] private TextMeshProUGUI resultOutPoint;        // 結果画面減点ポイント表示用UI
+    [SerializeField] private TextMeshProUGUI resultTortalPoint;     // 結果画面合計ポイント表示用UI
 
     [Header("SE関連")]
     private AudioSource audio;
@@ -59,6 +68,7 @@ public class HitManagerSolo : MonoBehaviour
     [SerializeField] private AudioClip gameEndSE;                   // ゲーム終了SE
 
     public bool IsStart { get => isStart; private set => isStart = value; }
+    public bool EndGame { get => endGame; set => endGame = value; }
 
     private void Awake()
     {
@@ -70,6 +80,8 @@ public class HitManagerSolo : MonoBehaviour
     private void StartSetUp()
     {
         score = 0;
+
+        InvisiblePlayerCamera();
 
         // カメラの位置を移動させます
         StartCoroutine(CameraSet());
@@ -152,15 +164,16 @@ public class HitManagerSolo : MonoBehaviour
         {
             phaseTime -= Time.deltaTime;
             timeText.text = phaseTime.ToString("00.0");
-            if (phaseTime <= 0)
+            // 残り時間がなくなるか、敵が全滅したらフェーズ終了
+            if (phaseTime <= 0 || enemyCount == 0)
             {
                 audio.PlayOneShot(gameEndSE);
                 IsStart = false;
-                endGame = true;
+                EndGame = true;
                 resultTortalPoint.text = score.ToString();
                 resultAttackPoint.text = attackPoint.ToString();
                 resultOutPoint.text = outPoint.ToString();
-                //isDown();
+                isDown();
                 GameCanvas.GetComponent<Animator>().SetTrigger("GameEnd");
             }
         }
@@ -173,7 +186,7 @@ public class HitManagerSolo : MonoBehaviour
     /// </summary>
     private void SetUp()
     {
-        if (!endGame)
+        if (!EndGame)
         {
             enemyCount = 0;
             isStart = true;
@@ -216,6 +229,15 @@ public class HitManagerSolo : MonoBehaviour
     }
 
     /// <summary>
+    /// プレイヤーをカメラから見えなくします
+    /// </summary>
+    private void InvisiblePlayerCamera()
+    {
+        int invisibleLayer = LayerMask.NameToLayer(invisibleLayerName);
+        playerObj.layer = invisibleLayer;
+    }
+
+    /// <summary>
     /// 弾が当たったオブジェクトのタグから処理を分岐させます
     /// </summary>
     /// <param name="TargetTag">弾が当たったオブジェクトのタグ</param>
@@ -230,11 +252,6 @@ public class HitManagerSolo : MonoBehaviour
             attackPoint++;
             enemyCount--;
             enemyCountText.text = enemyCount.ToString();
-            if(enemyCount == 0 && IsStart)
-            {
-                Invoke("isDown", breakTime);
-                Invoke("SetUp", setUpTime);
-            }
         }
         // princessだった場合、死亡アニメーションを再生し、リストから削除、減点します
         else if (TargetTag == princessTag)

@@ -1,3 +1,8 @@
+// TitleCameraManager.cs
+//
+// タイトル画面でのカメラ位置の管理を行う
+//
+
 using Unity.Cinemachine;
 using UnityEngine;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
 // HitManager.cs
 // 
-// オブジェクトの当たり判定を管理します
+// ユニットのペアの当たり判定を管理します
 // 
 
 using UnityEngine;

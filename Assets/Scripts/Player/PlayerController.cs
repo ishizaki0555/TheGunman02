@@ -1,3 +1,8 @@
+// PlayerController.cs
+//
+// プレイヤーの移動・ジャンプ・射撃処理を行います
+//
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
