@@ -56,13 +56,14 @@ public class HitManagerSolo : MonoBehaviour
     private bool endGame = false;                                   // ゲーム終了フラグ 
     [SerializeField] private TextMeshProUGUI resultAttackPoint;     // 結果画面攻撃ポイント表示用UI
     [SerializeField] private TextMeshProUGUI resultOutPoint;        // 結果画面減点ポイント表示用UI
-    [SerializeField] private TextMeshProUGUI resultLimitTime;     // 結果画面合計ポイント表示用UI
+    [SerializeField] private TextMeshProUGUI resultLimitTime;       // 結果画面合計ポイント表示用UI
 
     [Header("SE関連")]
     private AudioSource audio;
     [SerializeField] private AudioClip countDownSE;                 // カウントダウンSE
     [SerializeField] private AudioClip phaseStartSE;                // フェーズ開始SE
     [SerializeField] private AudioClip gameEndSE;                   // ゲーム終了SE
+    [SerializeField] private AudioClip _mainBGM;                    // メインBGM
 
     public bool IsStart { get => isStart; private set => isStart = value; }
     public bool EndGame { get => endGame; set => endGame = value; }
@@ -122,6 +123,8 @@ public class HitManagerSolo : MonoBehaviour
         IsStart = true;
         countDownText.text = countDownEndText;
         countDownText.gameObject.GetComponent<Animator>().SetTrigger("isCount");
+        audio.clip = _mainBGM;
+        audio.Play();
         yield return new WaitForSeconds(1f);
     }
 
@@ -164,6 +167,7 @@ public class HitManagerSolo : MonoBehaviour
             // 残り時間がなくなるか、敵が全滅したらフェーズ終了
             if (phaseTime <= 0 || enemyCount == 0)
             {
+                audio.Stop();
                 audio.PlayOneShot(gameEndSE);
                 IsStart = false;
                 EndGame = true;

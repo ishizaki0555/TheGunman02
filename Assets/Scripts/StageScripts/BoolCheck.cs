@@ -18,6 +18,9 @@ public class BoolCheck : MonoBehaviour
         isPlayMode = false;
     }
 
+    /// <summary>
+    /// ステージ開始条件をチェックし、条件が満たされたらオブジェクトの移動を開始する
+    /// </summary>
     private void Update()
     {
         if(!isPlayMode && _hitManagerSolo.IsStart)

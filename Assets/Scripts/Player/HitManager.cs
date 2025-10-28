@@ -69,6 +69,7 @@ public class HitManager : MonoBehaviour
     [SerializeField] private AudioClip countDownSE;                 // カウントダウンSE
     [SerializeField] private AudioClip phaseStartSE;                // フェーズ開始SE
     [SerializeField] private AudioClip gameEndSE;                   // ゲーム終了SE
+    [SerializeField] private AudioClip _mainBGM;                    // メインBGM
 
     public bool IsStart { get => isStart; private set => isStart = value; }
     public bool EndGame { get => endGame; set => endGame = value; }
@@ -140,6 +141,8 @@ public class HitManager : MonoBehaviour
         audio.PlayOneShot(phaseStartSE);
         countDownText.text = countDownEndText;
         countDownText.gameObject.GetComponent<Animator>().SetTrigger("isCount");
+        audio.clip = _mainBGM;
+        audio.Play();
         yield return new WaitForSeconds(1f);
     }
 
@@ -181,6 +184,7 @@ public class HitManager : MonoBehaviour
             timeText.text = phaseTime.ToString("00.0");
             if(phaseTime <= 0)
             {
+                audio.Stop();
                 audio.PlayOneShot(gameEndSE);
                 IsStart = false;
                 EndGame = true;

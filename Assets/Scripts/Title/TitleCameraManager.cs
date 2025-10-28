@@ -28,9 +28,14 @@ public class TitleCameraManager : MonoBehaviour
 
     [SerializeField] private bool isExperiment;
 
+    private AudioSource _audio;
+    [SerializeField] private AudioClip _selectSE;
+    [SerializeField] private AudioClip _decideSE;
+
     private void Start()
     {
         _animator = GetComponent<Animator>();
+        _audio = GetComponent<AudioSource>();
         mainCamraa.gameObject.transform.position = startCameraPosition;
         mainCamraa.gameObject.transform.eulerAngles = startCameraRotation;
         Cursor.lockState = CursorLockMode.Locked; // カーソルをロックする
@@ -45,7 +50,9 @@ public class TitleCameraManager : MonoBehaviour
         // カメラが選択されていない状態で決定ボタンが押されたらカメラを選択状態にする
         if (context.performed && !canSlected && isStarted)
         {
+            isStarted = false;
             _animator.SetTrigger("isStart");
+            _audio.PlayOneShot(_decideSE);
             currentSceneName = SceneNames[currentCameraIndex];
             StartCoroutine(SetCameraPosition());
             StartCoroutine(SetCameraRotation());
@@ -148,11 +155,13 @@ public class TitleCameraManager : MonoBehaviour
         mainCamraa.gameObject.transform.rotation = targetRotation;
     }
     /// <summary>
+    /// 選択時に交換音を再生します
     /// 現在のカメラから次のカメラ、または前のカメラに切り替えます。
     /// シーンの名前も対応して更新します。
     /// </summary>
     private void SelectCamera()
     {
+        _audio.PlayOneShot(_selectSE);
         currentSceneName = SceneNames[currentCameraIndex];
         StartCoroutine(SetCameraPosition());
         StartCoroutine(SetCameraRotation());
