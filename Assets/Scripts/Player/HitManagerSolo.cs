@@ -195,14 +195,14 @@ public class HitManagerSolo : MonoBehaviour
             // エネミーの有効化
             foreach (GameObject enemy in enemyObjs)
             {
-                enemy.GetComponent<Animator>().SetTrigger("isStart");
+                enemy.transform.GetChild(0).GetComponent<Animator>().SetTrigger("isStart");
                 enemyCount++;
                 enemyCountText.text = enemyCount.ToString();
             }
             // 一般市民の有効化
             foreach (GameObject princess in princessObjs)
             {
-                princess.GetComponent<Animator>().SetTrigger("isStart");
+                princess.transform.GetChild(0).GetComponent<Animator>().SetTrigger("isStart");
             }
             if (enemyCount == 0 && isStart)
             {

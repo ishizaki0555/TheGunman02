@@ -31,7 +31,7 @@ public class UnitMoveSettings
 
 public class ObjectsMover : MonoBehaviour
 {
-    [SerializeField] private List<UnitMoveSettings> unitMoveSettings = new List<UnitMoveSettings>();    // 各ユニットの移動設定リスト
+    public List<UnitMoveSettings> unitMoveSettings = new List<UnitMoveSettings>();    // 各ユニットの移動設定リスト
 
     /// <summary>
     /// ユニットの移動を開始させます
