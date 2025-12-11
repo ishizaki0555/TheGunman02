@@ -1,7 +1,7 @@
-using UnityEditorInternal;
-using UnityEditor;
 using UnityEngine;
-using Unity.Multiplayer.Center.Common;
+
+#if UNITY_EDITOR
+using UnityEditor;
 
 public class EnemyAutoGenetirrung : EditorWindow
 {
@@ -182,6 +182,8 @@ public class EnemyAutoGenetirrung : EditorWindow
         objectsMover.unitMoveSettings.Clear();
     }
 }
+#endif
+
 /// <summary>
 /// ê∂ê¨É^ÉCÉv
 /// </summary>

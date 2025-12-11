@@ -111,20 +111,15 @@ public class PlayerController : MonoBehaviour
             float lookX = _inputLook.x * _lookSensitivity * Time.deltaTime;
             float lookY = _inputLook.y * _lookSensitivity * Time.deltaTime;
 
-            // Y軸を中心に視点移動量を加算・減算
-            _mainCamera.transform.Rotate(Vector3.up * lookX);
-            _mainCamera.transform.Rotate(Vector3.right * -lookY);
-
-            // X軸を中心に視点移動量を加算・減算
-            _rotationY -= lookY;
-            _rotationX += lookX;
-
             // Y軸回転角度を上下の制限範囲内に収める
+            _rotationY -= lookY;
             _rotationY = Mathf.Clamp(_rotationY, _lookAngleMinY, _lookAngleMaxY);
+            // X軸の回転を更新
+            _rotationX += lookX;            
 
             // カメラのTransformに反映
-            _cameraTransform.localEulerAngles = new Vector3(_rotationY, _rotationX, 0);
-            _mainCamera.transform.position = Head.position;
+            Camera.main.transform.localEulerAngles = new Vector3(_rotationY, _rotationX, 0);
+            Camera.main.transform.transform.position = Head.position;
         }
     }
 

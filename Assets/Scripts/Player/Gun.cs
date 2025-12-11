@@ -9,26 +9,16 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class Gun : MonoBehaviour
 {
-    [SerializeField]
-    private bool AddBulletSpread = true;
-    [SerializeField]
-    private Vector3 BulletSpreadVariance = new Vector3(0.1f, 0.1f, 0.1f);
-    [SerializeField]
-    private ParticleSystem ShootingSystem;
-    [SerializeField]
-    private Transform BulletSpawnPoint;
-    [SerializeField]
-    private ParticleSystem ImpactParticleSystem;
-    [SerializeField]
-    private TrailRenderer BulletTrail;
-    [SerializeField]
-    private float ShootDelay = 0.5f;
-    [SerializeField]
-    private LayerMask Mask;
-    [SerializeField]
-    private float BulletSpeed = 100;
-    [SerializeField]
-    private AudioClip shootSound;
+    [SerializeField] private bool AddBulletSpread = true;                                   // 弾丸にズレを与えるか
+    [SerializeField] private Vector3 BulletSpreadVariance = new Vector3(0.1f, 0.1f, 0.1f);  // ズレの範囲
+    [SerializeField] private ParticleSystem ShootingSystem;                                 // 発射時のパーティクル
+    [SerializeField] private Transform BulletSpawnPoint;                                    // 弾丸の発射位置
+    [SerializeField] private ParticleSystem ImpactParticleSystem;                           // 弾丸が当たった時のパーティクル
+    [SerializeField] private TrailRenderer BulletTrail;                                     // 弾道のパーティクル
+    [SerializeField] private float ShootDelay = 0.5f;                                       // 発射後のディレイ時間
+    [SerializeField] private LayerMask Mask;                                                // 弾丸の判定対象
+    [SerializeField] private float BulletSpeed = 100;                                       // 弾速
+    [SerializeField] private AudioClip shootSound;                                          // 発射時の交換音
 
     private Animator Animator;
     private AudioSource audioSource;

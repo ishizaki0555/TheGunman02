@@ -8,7 +8,6 @@ using UnityEngine;
 public class BoolCheck : MonoBehaviour
 {
     [SerializeField] private HitManager _hitManager;
-    [SerializeField] private HitManagerSolo _hitManagerSolo;
     [SerializeField] private ObjectsMover _objectsMover;
 
     private bool isPlayMode;
@@ -23,7 +22,7 @@ public class BoolCheck : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if(!isPlayMode && _hitManagerSolo.IsStart)
+        if(!isPlayMode && _hitManager.IsStart)
         {
             isPlayMode = true;
             _objectsMover.ObjectsMove();

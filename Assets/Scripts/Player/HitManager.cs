@@ -18,11 +18,12 @@ public class HitManager : MonoBehaviour
 {
     [Header("タグ設定")]
     [SerializeField] [Tag]
-    private string enemyTag; // 敵のタグ
+    private string enemyTag;                        // 敵のタグ
     [SerializeField][Tag]
-    private string princessTag; // 救護対象のタグ[
+    private string princessTag;                     // 救護対象のタグ
     [SerializeField][Tag]
-    private string parentTag; // 親のタグ
+    private string parentTag;                       // 親のタグ
+    [SerializeField] private bool isSolo;           // エンティティに親がいるかどうか
 
     [Header("カメラ関連")]
     // シネマシーンのカメラオブジェクト
@@ -32,9 +33,9 @@ public class HitManager : MonoBehaviour
     [SerializeField] private GameObject GameCanvas;              // ゲームキャンバスオブジェクト
 
     [Header("オブジェクトのリスト")]
-    [SerializeField] private List<GameObject> enemyObj = new List<GameObject>();    // 敵のオブジェクトリスト
-    [SerializeField] private List<GameObject> princessObj = new List<GameObject>(); // 救護対象のオブジェクトリスト
-    [SerializeField] private List<GameObject> parentObj = new List<GameObject>();   // 親のオブジェクトリスト
+    [SerializeField] private List<GameObject> enemyObjs = new List<GameObject>();    // 敵のオブジェクトリスト
+    [SerializeField] private List<GameObject> princessObjs = new List<GameObject>(); // 救護対象のオブジェクトリスト
+    [SerializeField] private List<GameObject> parentObjs = new List<GameObject>();   // 親のオブジェクトリスト
 
     [Header("レイヤー設定")]
     public string invisibleLayerName = "InvisibleToCamera";
@@ -98,25 +99,28 @@ public class HitManager : MonoBehaviour
 
         // EnemyタグとPrincessタグのオブジェクトと、その二つの親ををリストに格納します
         GameObject[] targetObjects = GameObject.FindGameObjectsWithTag(enemyTag);
-        GameObject[] saveObjects = GameObject.FindGameObjectsWithTag(princessTag);
-        GameObject[] parent = GameObject.FindGameObjectsWithTag(parentTag);
         foreach (GameObject obj in targetObjects)
         {
-            enemyObj.Add(obj);
+            enemyObjs.Add(obj);
             obj.GetComponent<Animator>().SetTrigger("isDown");
             obj.GetComponent<Collider>().enabled = false;
         }
+        GameObject[] saveObjects = GameObject.FindGameObjectsWithTag(princessTag);
         foreach (GameObject obj in saveObjects)
         {
-            princessObj.Add(obj);
+            princessObjs.Add(obj);
             obj.GetComponent<Animator>().SetTrigger("isDown");
             obj.GetComponent<Collider>().enabled = false;
         }
-        foreach (GameObject obj in parent)
-        {
-            parentObj.Add(obj);
-        }
 
+        if (!isSolo)
+        {
+            GameObject[] parent = GameObject.FindGameObjectsWithTag(parentTag);
+            foreach (GameObject obj in parent)
+            {
+                parentObjs.Add(obj);
+            }
+        }
         // フェーズ開始の準備をします
         StartCoroutine(countDownAnim());
         Invoke("SetUp", setUpTime);
@@ -139,6 +143,7 @@ public class HitManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
         audio.PlayOneShot(phaseStartSE);
+        isStart = true;
         countDownText.text = countDownEndText;
         countDownText.gameObject.GetComponent<Animator>().SetTrigger("isCount");
         audio.clip = _mainBGM;
@@ -151,11 +156,12 @@ public class HitManager : MonoBehaviour
     /// </summary>
     private IEnumerator CameraSet()
     {
-        float elapsedTime = 0.0f;         // 経過時間
-        Vector3 startingPos = mainCamera.transform.position; // カメラの開始位置
+        float elapsedTime = 0.0f;                               // 経過時間
+        Vector3 startingPos = mainCamera.transform.position;    // カメラの開始位置
         Quaternion startingRot = mainCamera.transform.rotation; // カメラの開始回転
-        Quaternion targetRotation = cameraPos.rotation; // カメラの目標回転
+        Quaternion targetRotation = cameraPos.rotation;         // カメラの目標回転
 
+        // カメラをプレイヤー目線まで移動させる
         while (elapsedTime < cameraMoveTime)
         {
             mainCamera.gameObject.transform.position = new Vector3(
@@ -169,6 +175,7 @@ public class HitManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+        // 最終的な目線位置に移動
         mainCamera.gameObject.transform.position = cameraPos.position;
         mainCamera.gameObject.transform.rotation = targetRotation;
         yield return null;
@@ -194,6 +201,19 @@ public class HitManager : MonoBehaviour
                 isDown();
                 GameCanvas.GetComponent<Animator>().SetTrigger("GameEnd");
             }
+            // もしエネミーマトと住民マト個別判定だったら
+            else if((phaseTime <= 0 || enemyCount == 0) && isSolo)
+            {
+                audio.Stop();
+                audio.PlayOneShot(gameEndSE);
+                IsStart = false;
+                EndGame = true;
+                resultTortalPoint.text = phaseTime.ToString("00.0秒");
+                resultAttackPoint.text = attackPoint.ToString();
+                resultOutPoint.text = outPoint.ToString();
+                isDown();
+                GameCanvas.GetComponent<Animator>().SetTrigger("GameEnd");
+            }
         }
     }
 
@@ -201,17 +221,18 @@ public class HitManager : MonoBehaviour
     /// フェーズ開始の準備をします
     /// １．エネミーと一般市民のオブジェクトをランダムに有効化します。
     /// ２．エネミーの数をカウントします。
-    ///  3．エネミーの数が０だった場合、再度ランダムに有効化します。
+    /// ３．エネミーの数が０だった場合、再度ランダムに有効化します。
+    /// もしマトが個別判定だったら個別に有効化する
     /// </summary>
     private void SetUp()
     {
-        if(!EndGame)
+        if(!EndGame && !isSolo)
         {
             enemyCount = 0;
             IsStart = true;
             gunObj.SetActive(true);
             // enemyObjからランダムなオブジェクト有効化します。
-            foreach (GameObject proj in parentObj)
+            foreach (GameObject proj in parentObjs)
             {
                 // if文でbool値をランダムに生成し、true(1)だった場合に有効化し、enemyCountを加算します。
                 if (UnityEngine.Random.Range(0, 2) == 0)
@@ -231,6 +252,29 @@ public class HitManager : MonoBehaviour
                 Invoke("SetUp", setUpTime);
             }
         }
+        else if(!EndGame && isSolo)
+        {
+            enemyCount = 0;
+            isStart = true;
+            gunObj.SetActive(true);
+            // エネミーの有効化
+            foreach (GameObject enemy in enemyObjs)
+            {
+                enemy.transform.GetChild(0).GetComponent<Animator>().SetTrigger("isStart");
+                enemyCount++;
+                enemyCountText.text = enemyCount.ToString();
+            }
+            // 一般市民の有効化
+            foreach (GameObject princess in princessObjs)
+            {
+                princess.transform.GetChild(0).GetComponent<Animator>().SetTrigger("isStart");
+            }
+            if (enemyCount == 0 && isStart)
+            {
+                Invoke("isDown", breakTime);
+                Invoke("SetUp", setUpTime);
+            }
+        }
     }
 
     /// <summary>
@@ -238,10 +282,28 @@ public class HitManager : MonoBehaviour
     /// </summary>
     private void isDown()
     {
-        foreach (GameObject proj in parentObj)
+        // もし個別判定じゃなかったら
+        if (!isSolo)
         {
-            proj.transform.GetChild(0).GetComponent<Animator>().SetTrigger("isDown");
-            proj.transform.GetChild(1).GetComponent<Animator>().SetTrigger("isDown");
+            foreach (GameObject proj in parentObjs)
+            {
+                proj.transform.GetChild(0).GetComponent<Animator>().SetTrigger("isDown");
+                proj.transform.GetChild(1).GetComponent<Animator>().SetTrigger("isDown");
+            }
+        }
+        // もし個別判定だったら
+        else
+        {
+            // エネミーの無効化
+            foreach (GameObject enemy in enemyObjs)
+            {
+                enemy.GetComponent<Animator>().SetTrigger("isDown");
+            }
+            // 一般市民の無効化
+            foreach (GameObject princess in princessObjs)
+            {
+                princess.GetComponent<Animator>().SetTrigger("isDown");
+            }
         }
     }
 
@@ -261,31 +323,59 @@ public class HitManager : MonoBehaviour
     /// <param name="TargetObj">弾が当たったオブジェクト</param>
     public void TagCheck(string TargetTag, GameObject TargetObj)
     {
-        // enemyだった場合、死亡アニメーションを再生し、リストから削除、加点します
-        if (TargetTag == enemyTag)
+        if (isSolo)
         {
-            TargetObj.GetComponent<Animator>().SetTrigger("isDead");
-            score++;
-            attackPoint++;
-            enemyCount--;
-            enemyCountText.text = enemyCount.ToString();
-            if (enemyCount == 0 && IsStart)
+            // enemyだった場合、死亡アニメーションを再生し、リストから削除、加点します
+            if (TargetTag == enemyTag)
             {
-                Invoke("isDown", breakTime);
-                Invoke("SetUp", setUpTime);
+                TargetObj.GetComponent<Animator>().SetTrigger("isDead");
+                score++;
+                attackPoint++;
+                enemyCount--;
+                enemyCountText.text = enemyCount.ToString();
+            }
+            // princessだった場合、死亡アニメーションを再生し、リストから削除、減点します
+            else if (TargetTag == princessTag)
+            {
+                TargetObj.GetComponent<Animator>().SetTrigger("isDead");
+                outPoint++;
+                score--;
+            }
+            else
+            {
+                // 何も当たらなかった場合銃が打てなくなるので何もしない動作を追加する
+                return;
             }
         }
-        // princessだった場合、死亡アニメーションを再生し、リストから削除、減点します
-        else if (TargetTag == princessTag)
+        else
         {
-            TargetObj.GetComponent<Animator>().SetTrigger("isDead");
-            outPoint++;
-            score--;
-        }
-        // PracticeTargetだった場合、死亡アニメーションを再生します
-        else if (TargetTag == "PracticeTarget")
-        {
-            TargetObj.GetComponent<Animator>().SetTrigger("isDead");
+            // enemyだった場合、死亡アニメーションを再生し、リストから削除、加点します
+            if (TargetTag == enemyTag)
+            {
+                TargetObj.GetComponent<Animator>().SetTrigger("isDead");
+                score++;
+                attackPoint++;
+                enemyCount--;
+                enemyCountText.text = enemyCount.ToString();
+                if (enemyCount == 0 && IsStart)
+                {
+                    Invoke("isDown", breakTime);
+                    Invoke("SetUp", setUpTime);
+                }
+            }
+            // princessだった場合、死亡アニメーションを再生し、リストから削除、減点します
+            else if (TargetTag == princessTag)
+            {
+                TargetObj.GetComponent<Animator>().SetTrigger("isDead");
+                outPoint++;
+                score--;
+            }
+            // PracticeTargetだった場合、死亡アニメーションを再生します
+            else if (TargetTag == "PracticeTarget")
+            {
+                TargetObj.GetComponent<Animator>().SetTrigger("isDead");
+            }
+            else return;
         }
     }
 }
