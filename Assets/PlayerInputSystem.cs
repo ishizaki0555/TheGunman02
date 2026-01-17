@@ -136,6 +136,15 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Scope"",
+                    ""type"": ""Button"",
+                    ""id"": ""79e00e9d-e1fc-4626-81c9-32a0881b285d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -246,6 +255,17 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
                     ""action"": ""Acsept"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a3ef8b88-65d2-41a3-93ba-dc189a257a2f"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scope"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -390,6 +410,7 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Acsept = m_Player.FindAction("Acsept", throwIfNotFound: true);
+        m_Player_Scope = m_Player.FindAction("Scope", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_PlusSelect = m_UI.FindAction("PlusSelect", throwIfNotFound: true);
@@ -481,6 +502,7 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Fire;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Acsept;
+    private readonly InputAction m_Player_Scope;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -512,6 +534,10 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Acsept".
         /// </summary>
         public InputAction @Acsept => m_Wrapper.m_Player_Acsept;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Scope".
+        /// </summary>
+        public InputAction @Scope => m_Wrapper.m_Player_Scope;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -553,6 +579,9 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
             @Acsept.started += instance.OnAcsept;
             @Acsept.performed += instance.OnAcsept;
             @Acsept.canceled += instance.OnAcsept;
+            @Scope.started += instance.OnScope;
+            @Scope.performed += instance.OnScope;
+            @Scope.canceled += instance.OnScope;
         }
 
         /// <summary>
@@ -579,6 +608,9 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
             @Acsept.started -= instance.OnAcsept;
             @Acsept.performed -= instance.OnAcsept;
             @Acsept.canceled -= instance.OnAcsept;
+            @Scope.started -= instance.OnScope;
+            @Scope.performed -= instance.OnScope;
+            @Scope.canceled -= instance.OnScope;
         }
 
         /// <summary>
@@ -837,6 +869,13 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAcsept(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Scope" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnScope(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

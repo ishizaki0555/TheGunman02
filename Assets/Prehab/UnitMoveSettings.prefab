@@ -44,27 +44,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b330da3037dfc64e9071cca23dbc84a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitMoveSettings:
-  - unit: {fileID: 0}
-    targetPos:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    moveSpeed: 3
-    standbyTime: 1
-    rotatingSpeed: 1
-    currentState: 0
-  - unit: {fileID: 0}
-    targetPos:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    moveSpeed: 3
-    standbyTime: 1
-    rotatingSpeed: 1
-    currentState: 0
+  unitMoveSettings: []

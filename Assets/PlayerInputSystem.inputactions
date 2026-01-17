@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "PlayerInputSystem",
     "maps": [
         {
@@ -45,6 +46,15 @@
                     "name": "Acsept",
                     "type": "Button",
                     "id": "241246ba-707a-45e6-8488-1634a610e17c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Scope",
+                    "type": "Button",
+                    "id": "79e00e9d-e1fc-4626-81c9-32a0881b285d",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -159,6 +169,17 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "Acsept",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a3ef8b88-65d2-41a3-93ba-dc189a257a2f",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Scope",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

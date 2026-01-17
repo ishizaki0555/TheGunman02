@@ -21,7 +21,7 @@ public enum moveState
 public class UnitMoveSettings
 {
     public GameObject unit;                                     // 移動するオブジェクト
-    public List<Transform> targetPos = new List<Transform>();   // 移動先リスト 
+    public List<Vector3> targetPos = new List<Vector3>();       // 移動先リスト 
     public float moveSpeed;                                     // 移動速度
     public float standbyTime;                                   // 移動先での待機時間
     public float rotatingSpeed;                                 // 回転速度
@@ -31,7 +31,7 @@ public class UnitMoveSettings
 
 public class ObjectsMover : MonoBehaviour
 {
-    public List<UnitMoveSettings> unitMoveSettings = new List<UnitMoveSettings>();    // 各ユニットの移動設定リスト
+    public List<UnitMoveSettings> unitMoveSettings;    // 各ユニットの移動設定リスト
 
     /// <summary>
     /// ユニットの移動を開始させます
@@ -52,13 +52,13 @@ public class ObjectsMover : MonoBehaviour
     IEnumerator MoveObjectCoroutine(UnitMoveSettings unitMoveSettings)
     {
         var unit = unitMoveSettings.unit;
-        unit.transform.position = unitMoveSettings.targetPos[0].position;
+        unit.transform.position = unitMoveSettings.targetPos[0];
         Collider enemyCollider = unit.transform.GetChild(0).GetComponent<Collider>();
 
         // 次の目的地まで移動・待機を繰り返す
         foreach (var nextPos in unitMoveSettings.targetPos)
         {
-            Vector3 targetPosition = nextPos.position;
+            Vector3 targetPosition = nextPos;
             // unitの状態を移動中に変更し、targetPositionに到達するまで移動
             // 移動し終わったら回転中に状態を変更し、次のtargetPositionまで回転
             while (Vector3.Distance(unit.transform.position, targetPosition) > 0.1f && enemyCollider.enabled != false)

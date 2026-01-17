@@ -8,6 +8,7 @@ TagManager:
   - Queen
   - PracticeTarget
   - Parent
+  - Building
   layers:
   - Default
   - TransparentFX
@@ -17,7 +18,7 @@ TagManager:
   - UI
   - InvisibleToCamera
   - MovePoint
-  - 
+  - Terrain
   - 
   - 
   - 

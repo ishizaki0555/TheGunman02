@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 1651944272617268868}
   serializedVersion: 2
   m_LocalRotation: {x: 0.18301274, y: -0.6830127, z: 0.18301274, w: 0.6830127}
-  m_LocalPosition: {x: -3.56, y: -2.12, z: 0.59}
+  m_LocalPosition: {x: -37.1, y: 9.3, z: -4.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -186,7 +186,7 @@ MonoBehaviour:
   enemyTag: Enemy
   princessTag: Queen
   parentTag: Parent
-  isSolo: 0
+  isSolo: 1
   cameraPos: {fileID: 5549052950118308709}
   mainCamera: {fileID: 254587841392320377}
   gunObj: {fileID: 6033589204396669531}
@@ -400,31 +400,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -12.551133
+      value: -47.9
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -9.589928
+      value: 3.7
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.5059519
+      value: -4.23
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -432,11 +432,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5412421712239215322, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_Name
@@ -512,7 +516,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0.02, y: 0.89, z: 0}
+  m_Center: {x: 0.02, y: 0.87, z: 0}
 --- !u!114 &1606371842442289866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -630,6 +634,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 241246ba-707a-45e6-8488-1634a610e17c
     m_ActionName: 'Player/Acsept[/XInputControllerWindows/buttonEast]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 213881531169583332}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnScope
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 79e00e9d-e1fc-4626-81c9-32a0881b285d
+    m_ActionName: 'Player/Scope[/XInputControllerWindows/leftTrigger]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -657,7 +677,7 @@ CapsuleCollider:
   m_Radius: 0.34
   m_Height: 0.97
   m_Direction: 1
-  m_Center: {x: 0, y: 0.5, z: 0}
+  m_Center: {x: 0, y: 1.42, z: 0}
 --- !u!114 &213881531169583332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -670,21 +690,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c560b2cc5181134cba3636cd7b87567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 3
-  _jumpSpeed: 7
-  _gravity: 15
-  _fallSpeed: 10
-  _initFallSpeed: 2
-  _mainCamera: {fileID: 254587841392320377}
-  _lookSensitivity: 1
-  _lookAngleMinY: -10
-  _lookAngleMaxY: 10
-  _rotationY: 0
-  _rotationX: 0
-  _cameraTransform: {fileID: 5549052950118308709}
+  speed: 3
+  jumpSpeed: 7
+  gravity: 15
+  fallSpeed: 10
+  initFallSpeed: 2
+  mainCamera: {fileID: 0}
+  lookSensitivity: 0
+  lookAngleMinY: -60
+  lookAngleMaxY: 60
+  rotationY: 0
+  rotationX: 0
+  cameraTransform: {fileID: 0}
   Head: {fileID: 5549052950118308709}
+  normalFOV: 60
+  scopeFOV: 20
+  scopeLerpSpeed: 10
+  normalSensitivity: 1
+  scopeSensitivity: 0.3
   _gun: {fileID: 239785752438574857}
-  _hitManager: {fileID: 5572320755627872730}
+  hitManager: {fileID: 0}
 --- !u!1001 &9046547382075416238
 PrefabInstance:
   m_ObjectHideFlags: 0

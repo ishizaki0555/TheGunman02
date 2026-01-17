@@ -9,16 +9,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -3.9206653
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 50.7
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 86.7742
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -56,21 +60,31 @@ PrefabInstance:
       propertyPath: m_Name
       value: rpgpp_lt_awning_standing_01b
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
+      propertyPath: m_TagString
+      value: Building
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -7580825393297223128}
+      addedObject: {fileID: 1919873782388989040}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 31351753267902471}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7311106710782801182}
   m_SourcePrefab: {fileID: 100100000, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
 --- !u!1 &3484804037060006919 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
   m_PrefabInstance: {fileID: 4367905732276922710}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &-7580825393297223128
-MeshCollider:
+--- !u!65 &1919873782388989040
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -87,7 +101,42 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -3568516143216613761, guid: 903efcc7e62721c46ae1abc12e5f159b, type: 3}
+  serializedVersion: 3
+  m_Size: {x: 4.239377, y: 5.4173665, z: 3.9062874}
+  m_Center: {x: -0.037073016, y: 1.7086828, z: 0.0057314634}
+--- !u!114 &31351753267902471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3484804037060006919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
+--- !u!208 &7311106710782801182
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3484804037060006919}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 2.1200001, y: 2.709, z: 1.9530001}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -0.037, y: 1.7090001, z: 0.006}
+  m_TimeToStationary: 0.5
