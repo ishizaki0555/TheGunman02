@@ -9,7 +9,7 @@ public class EnemyAutoGenetirrung : EditorWindow
 {
     private GeneratorType generatorType;        // 生成タイプ
     private GameObject[] baseObject;            // 生成する敵のベースオブジェクト
-    private CharaType _chataType;               // 敵のタイプ
+    private CharaType _charaType;               // 敵のタイプ
     private int creatCount;                     // 生成数
 
     // ランダム生成用のパラメータ
@@ -34,7 +34,7 @@ public class EnemyAutoGenetirrung : EditorWindow
     {
         GUILayout.Label("敵の自動生成ツール", EditorStyles.boldLabel);
         generatorType = (GeneratorType)EditorGUILayout.EnumPopup("生成タイプ", generatorType);
-        _chataType = (CharaType)EditorGUILayout.EnumPopup("生成物のタイプ", _chataType);
+        _charaType = (CharaType)EditorGUILayout.EnumPopup("生成物のタイプ", _charaType);
         creatCount = EditorGUILayout.IntField("生成数", creatCount);
 
         // 生成タイプに応じて処理を分岐
@@ -81,32 +81,23 @@ public class EnemyAutoGenetirrung : EditorWindow
     /// </summary>
     private void GenerateEnemies()
     {
-        // 生成数が０か、ベースオブジェクトが設定されていない場合は警告を表示して終了
-        if (baseObject == null || creatCount == 0)
+        if(baseObject == null || creatCount == 0)
         {
-            Debug.LogWarning("生成する敵のベースオブジェクトが設定されていないか、生成数が0です。");
+            Debug.LogError("敵のベースオブジェクトが設定されていないか、生成数が０です。");
             return;
         }
 
-        // エンティティの生成処理
         for(int i = 0; i < creatCount; i++)
         {
-            // 敵かNPCのどちらかをランダムに選択
-            _chataType = (CharaType)Random.Range(0, 2);
-            GameObject entity = baseObject[(int)_chataType];
+            _charaType = (CharaType)Random.Range(0, 2);
+            GameObject entity = baseObject[(int)_charaType];
 
-            // ====================
-            // 中心座標を基準に生成位置を決定
-            // ====================
-            // 入力してある半径内のランダムな位置を生成
-            float fixedY = GeneretorCecter.y;
+            // NavMesh上の位置を取得
             Vector3 spawnPosition = GetRandomNavMeshPosition();
 
-            // ====================
-            // 敵またはNPCの生成
-            // ====================
-            GameObject enemy = Instantiate(entity, spawnPosition, Quaternion.identity);
-            enemy.name = entity.name + "_" + i.ToString("D3");
+            // 敵の生成
+            Instantiate(entity, spawnPosition, Quaternion.identity);
+            entity.name = "Entity_" + i.ToString("D3");
         }
     }
 
@@ -163,8 +154,8 @@ public class EnemyAutoGenetirrung : EditorWindow
 
         for(int i = 0; i < creatCount; i++)
         {
-            _chataType = (CharaType)Random.Range(0, 2);
-            GameObject entity = baseObject[(int)_chataType];
+            _charaType = (CharaType)Random.Range(0, 2);
+            GameObject entity = baseObject[(int)_charaType];
 
             // ====================
             // NavMesh上にランダム生成
