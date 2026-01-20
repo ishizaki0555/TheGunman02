@@ -24,7 +24,7 @@ public class TitleCameraManager : MonoBehaviour
     private int currentCameraIndex = 0;             // 現在選択されているカメラのインデックス
     private bool canSlected = false;                // カメラが選択されているかどうか
     private bool isStarted = false;                 // タイトル画面が開始されたかどうか
-    private Animator _animator;         
+    private Animator animator;         
 
     [SerializeField] private bool isExperiment;
 
@@ -34,7 +34,7 @@ public class TitleCameraManager : MonoBehaviour
 
     private void Start()
     {
-        _animator = GetComponent<Animator>();
+        animator = GetComponent<Animator>();
         _audio = GetComponent<AudioSource>();
         mainCamraa.gameObject.transform.position = startCameraPosition;
         mainCamraa.gameObject.transform.eulerAngles = startCameraRotation;
@@ -51,23 +51,16 @@ public class TitleCameraManager : MonoBehaviour
         if (context.performed && !canSlected && isStarted)
         {
             isStarted = false;
-            _animator.SetTrigger("isStart");
+            animator.SetTrigger("isStart");
             _audio.PlayOneShot(_decideSE);
             currentSceneName = SceneNames[currentCameraIndex];
             StartCoroutine(SetCameraPosition());
             StartCoroutine(SetCameraRotation());
         }
         // 何もないシーンに移り、記録されているシーン名のシーンからオブジェクトを読み込む
-        else if (context.performed && canSlected && !isExperiment)
+        else if (context.performed && canSlected)
         {
-            // カメラが選択された状態で決定ボタンが押されたら次のシーンへ
-            PlayerPrefs.SetString("SelectedScene", currentSceneName);
-            UnityEngine.SceneManagement.SceneManager.LoadScene("MainGame");
-        }
-        // 記録されているシーン名のシーンからオブジェクトを非同期で読み込む
-        else if (context.performed && canSlected && isExperiment)
-        {
-            StartCoroutine(LoadYourAsyncScene());
+            animator.SetTrigger("loadScene");
         }
     }
 
@@ -81,7 +74,7 @@ public class TitleCameraManager : MonoBehaviour
         {
             currentCameraIndex++;
             currentCameraIndex = (int)Mathf.Repeat(currentCameraIndex, SceneNames.Count);
-            _animator.SetTrigger("isRight");
+            animator.SetTrigger("isRight");
             SelectCamera();
         }
     }
@@ -96,7 +89,7 @@ public class TitleCameraManager : MonoBehaviour
         {
             currentCameraIndex--;
             currentCameraIndex = (int)Mathf.Repeat(currentCameraIndex, SceneNames.Count);
-            _animator.SetTrigger("isLeft");
+            animator.SetTrigger("isLeft");
             SelectCamera();
         }
     }
@@ -154,6 +147,24 @@ public class TitleCameraManager : MonoBehaviour
         // 補間が終わった後、目標のクォータニオンにぴったり合わせる
         mainCamraa.gameObject.transform.rotation = targetRotation;
     }
+
+    /// <summary>
+    /// アニメーションからフェードインが終わったらシーンへ移行します
+    /// </summary>
+    public void LoadScene()
+    {
+        if (!isExperiment)
+        {
+            // カメラが選択された状態で決定ボタンが押されたら次のシーンへ
+            PlayerPrefs.SetString("SelectedScene", currentSceneName);
+            UnityEngine.SceneManagement.SceneManager.LoadScene("MainGame");
+        }
+        else
+        {
+            StartCoroutine(LoadYourAsyncScene());
+        }
+    }
+
     /// <summary>
     /// 選択時に交換音を再生します
     /// 現在のカメラから次のカメラ、または前のカメラに切り替えます。

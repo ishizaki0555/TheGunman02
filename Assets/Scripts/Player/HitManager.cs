@@ -92,8 +92,6 @@ public class HitManager : MonoBehaviour
     {
         score = 0;
 
-        InvisiblePlayerCamera();
-
         // カメラの位置を移動させます
         StartCoroutine(CameraSet());
 
@@ -175,6 +173,8 @@ public class HitManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+        int invisibleLayer = LayerMask.NameToLayer(invisibleLayerName);
+        InvisiblePlayerCamera(playerObj, invisibleLayer);
         // 最終的な目線位置に移動
         mainCamera.gameObject.transform.position = cameraPos.position;
         mainCamera.gameObject.transform.rotation = targetRotation;
@@ -310,10 +310,13 @@ public class HitManager : MonoBehaviour
     /// <summary>
     /// プレイヤーをカメラから見えなくします
     /// </summary>
-    private void InvisiblePlayerCamera()
+    private void InvisiblePlayerCamera(GameObject player, int invisibleLayer)
     {
-        int invisibleLayer = LayerMask.NameToLayer(invisibleLayerName);
-        playerObj.layer = invisibleLayer;
+        player.layer = invisibleLayer;
+        foreach(Transform child in player.transform)
+        {
+            InvisiblePlayerCamera(child.gameObject, invisibleLayer);
+        }
     }
 
     /// <summary>
