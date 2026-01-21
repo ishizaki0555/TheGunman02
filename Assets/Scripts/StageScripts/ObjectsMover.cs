@@ -6,6 +6,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public enum moveState
 {
@@ -51,49 +52,33 @@ public class ObjectsMover : MonoBehaviour
     /// <param name="unitMoveSettings">ユニットの移動設定リスト</param>
     IEnumerator MoveObjectCoroutine(UnitMoveSettings unitMoveSettings)
     {
-        var unit = unitMoveSettings.unit;
-        unit.transform.position = unitMoveSettings.targetPos[0];
-        Collider enemyCollider = unit.transform.GetChild(0).GetComponent<Collider>();
+        if(!unitMoveSettings.unit) yield break;
 
-        // 次の目的地まで移動・待機を繰り返す
-        foreach (var nextPos in unitMoveSettings.targetPos)
+        NavMeshAgent agent = unitMoveSettings.unit.GetComponent<NavMeshAgent>();
+        if(!agent) yield break;
+
+        agent.speed = unitMoveSettings.moveSpeed;
+
+        foreach(var nextPos in unitMoveSettings.targetPos)
         {
-            Vector3 targetPosition = nextPos;
-            // unitの状態を移動中に変更し、targetPositionに到達するまで移動
-            // 移動し終わったら回転中に状態を変更し、次のtargetPositionまで回転
-            while (Vector3.Distance(unit.transform.position, targetPosition) > 0.1f && enemyCollider.enabled != false)
+            unitMoveSettings.currentState = moveState.Moving;
+            agent.SetDestination(nextPos);
+
+            // 到達するまで待つ
+            while(true)
             {
-                // 状態を移動中に変更
-                unitMoveSettings.currentState = moveState.Moving;
-
-                // 次の目的地まで移動
-                unit.transform.position = Vector3.MoveTowards(
-                    unit.transform.position,
-                    targetPosition,
-                    unitMoveSettings.moveSpeed * Time.deltaTime
-                    );
-
-                // 目的地の方向を向くように回転
-                Vector3 direction = unit.transform.position - targetPosition;
-                if(direction != Vector3.zero)
+                if(!agent.pathPending &&
+                    agent.remainingDistance <= agent.stoppingDistance &&
+                    !agent.hasPath)
                 {
-                    Quaternion targetRotation = Quaternion.LookRotation(direction);
-                    unit.transform.rotation = Quaternion.Slerp(
-                        unit.transform.rotation,
-                        targetRotation,
-                        unitMoveSettings.rotatingSpeed * Time.deltaTime
-                        );
+                    break;
                 }
                 yield return null;
             }
 
-            // 目的地に到着
-
-            // 状態を待機中に変更して待機
+            // 待機
             unitMoveSettings.currentState = moveState.Waiting;
             yield return new WaitForSeconds(unitMoveSettings.standbyTime);
-
         }
-        yield return null;
     }
 }

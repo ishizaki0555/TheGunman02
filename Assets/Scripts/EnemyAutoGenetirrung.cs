@@ -168,7 +168,7 @@ public class EnemyAutoGenetirrung : EditorWindow
             // ====================
             // NavMeshã‚ÉˆÚ“®ƒ|ƒCƒ“ƒg‚ğ•¡”¶¬
             // ==================== 
-            UnitMoveSettings moveSettings = new UnitMoveSettings();
+            UnitMoveSettings moveSettings = new();
             moveSettings.unit = enemy;
 
             int routeCount = 5;
@@ -179,7 +179,7 @@ public class EnemyAutoGenetirrung : EditorWindow
             }
 
             moveSettings.unit = enemy;
-            moveSettings.moveSpeed = 2.0f;
+            moveSettings.moveSpeed = 20.0f;
             moveSettings.standbyTime = 1.0f;
             moveSettings.rotatingSpeed = 5.0f;
 
